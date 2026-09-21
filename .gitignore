@@ -1,0 +1,19 @@
+# Dependências
+node_modules/
+
+# Logs e diagnósticos
+*.log
+npm-debug.log*
+
+# Banco de dados local SQLite (recriado e semeado automaticamente no boot)
+data/*.db
+data/*.db-wal
+data/*.db-shm
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Variáveis de ambiente
+.env
+.env.local
