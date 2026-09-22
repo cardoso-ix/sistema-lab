@@ -296,7 +296,8 @@ Diretrizes obrigatórias:
    3. Padrão de Trabalho Recomendado e Rastreabilidade RBC
    4. Sequência Operacional de Ensaio (Passo a Passo)
    5. Critérios de Aceitação e Tolerâncias Aplicáveis
-3. Retorne APENAS o texto pronto do procedimento, SEM blocos de código markdown (\`\`\`), SEM aspas envolvendo o texto e SEM mensagens de introdução ou conclusão.`;
+3. HIGIENIZAÇÃO DE ÁUDIO / ANTI-REPETIÇÃO: O relato do técnico pode ter sido obtido por ditado de voz no microfone e conter ecos de transcrição, gaguejos ou palavras/frases repetidas várias vezes (ex: "aplicamos aplicamos 10V", "foi feita a calibração foi feita a calibração", "estabilizamos estabilizamos"). ELIMINE AUTOMATICAMENTE quaisquer repetições ou duplicações involuntárias, entregando um texto fluido, conciso e metrologicamente impecável.
+4. Retorne APENAS o texto pronto do procedimento, SEM blocos de código markdown (\`\`\`), SEM aspas envolvendo o texto e SEM mensagens de introdução ou conclusão.`;
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 60000);
@@ -354,10 +355,79 @@ Diretrizes obrigatórias:
 }
 
 /**
+ * Remove repetições consecutivas de palavras e frases do relato de voz.
+ * Elimina gaguejos, duplicações de áudio e loops de transcrição (ex: "calibração calibração" -> "calibração",
+ * "foi feita a calibração foi feita a calibração" -> "foi feita a calibração").
+ */
+function deduplicateSpeechText(text) {
+  if (!text || typeof text !== 'string') return '';
+  const tokens = text.trim().split(/\s+/);
+  if (tokens.length <= 1) return text.trim();
+
+  function norm(w) {
+    return (w || '').toLowerCase().replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
+  }
+
+  let result = [];
+  let i = 0;
+
+  while (i < tokens.length) {
+    let matchedLength = 0;
+    // Permite frases repetidas de até 15 palavras consecutivas
+    const maxBlock = Math.min(15, Math.floor((tokens.length - i) / 2));
+    // Procura o menor período repetitivo (L = 1 até maxBlock) para evitar falso agrupamento de palavras repetidas
+    for (let L = 1; L <= maxBlock; L++) {
+      let isRepeat = true;
+      for (let k = 0; k < L; k++) {
+        const a = norm(tokens[i + k]);
+        const b = norm(tokens[i + L + k]);
+        if (!a || !b || a !== b) {
+          isRepeat = false;
+          break;
+        }
+      }
+      if (isRepeat) {
+        matchedLength = L;
+        break;
+      }
+    }
+
+    if (matchedLength > 0) {
+      for (let k = 0; k < matchedLength; k++) {
+        result.push(tokens[i + k]);
+      }
+      i += matchedLength;
+      while (i + matchedLength <= tokens.length) {
+        let isSame = true;
+        for (let k = 0; k < matchedLength; k++) {
+          const a = norm(tokens[i - matchedLength + k]);
+          const b = norm(tokens[i + k]);
+          if (!a || !b || a !== b) {
+            isSame = false;
+            break;
+          }
+        }
+        if (isSame) {
+          i += matchedLength;
+        } else {
+          break;
+        }
+      }
+    } else {
+      result.push(tokens[i]);
+      i++;
+    }
+  }
+
+  return result.join(' ');
+}
+
+/**
  * Fallback local caso a API esteja offline:
- * Estrutura o relato do técnico nos tópicos da ISO/IEC 17025.
+ * Estrutura o relato do técnico nos tópicos da ISO/IEC 17025 com higienização de voz.
  */
 function formatLocalProcedureFallback(draftText, manufacturer, model, measurand) {
+  const cleanDraft = deduplicateSpeechText(draftText);
   const title = manufacturer && model ? `${manufacturer} ${model}` : 'Instrumento de Bancada';
   return `1. Aclimatação e Estabilização Térmica:
 Manter o instrumento e os padrões de teste na bancada em ambiente controlado (20 ± 2 °C ou 23 ± 5 °C, UR 30% a 70%) por no mínimo 2 horas antes de iniciar os ensaios.
@@ -369,7 +439,7 @@ Verificar a integridade visual geral de ${title}, terminais de conexão e ausên
 Utilizar padrões de calibração rastreáveis RBC/INMETRO com relação de capacidade de medição TUR ≥ 4:1.
 
 4. Sequência Operacional de Ensaio:
-${draftText.trim()}
+${cleanDraft.trim()}
 
 5. Critérios de Aceitação e Tolerâncias:
 Calcular o erro de indicação em cada ponto (Erro = Indicação - Padrão). O instrumento é aprovado se o erro estiver dentro dos limites máximos admissíveis de fábrica.`;
@@ -378,5 +448,6 @@ Calcular o erro de indicação em cada ponto (Erro = Indicação - Padrão). O i
 module.exports = {
   generateMetrologyData,
   refineProcedureWithAi,
+  deduplicateSpeechText,
   DEFAULT_MODEL
 };

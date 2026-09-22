@@ -761,7 +761,77 @@ let speechRecognition = null;
 let isRecordingAudio = false;
 let audioRecordStartTime = null;
 let audioRecordTimerInterval = null;
+let audioRestartTimeout = null;
 let originalProcedureText = '';
+let audioBaseProcedureText = '';
+let sessionFinalizedSegments = [];
+
+/**
+ * Higienização e remoção de repetições consecutivas (palavras e frases)
+ * causadas por gaguejo, eco de microfone ou acúmulo de buffers na Web Speech API.
+ */
+function deduplicateSpeechText(text) {
+  if (!text || typeof text !== 'string') return '';
+  const tokens = text.trim().split(/\s+/);
+  if (tokens.length <= 1) return text.trim();
+
+  function norm(w) {
+    return (w || '').toLowerCase().replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
+  }
+
+  let result = [];
+  let i = 0;
+
+  while (i < tokens.length) {
+    let matchedLength = 0;
+    const maxBlock = Math.min(15, Math.floor((tokens.length - i) / 2));
+
+    // Procura o menor período repetitivo (L = 1 até maxBlock)
+    for (let L = 1; L <= maxBlock; L++) {
+      let isRepeat = true;
+      for (let k = 0; k < L; k++) {
+        const a = norm(tokens[i + k]);
+        const b = norm(tokens[i + L + k]);
+        if (!a || !b || a !== b) {
+          isRepeat = false;
+          break;
+        }
+      }
+      if (isRepeat) {
+        matchedLength = L;
+        break;
+      }
+    }
+
+    if (matchedLength > 0) {
+      for (let k = 0; k < matchedLength; k++) {
+        result.push(tokens[i + k]);
+      }
+      i += matchedLength;
+      while (i + matchedLength <= tokens.length) {
+        let isSame = true;
+        for (let k = 0; k < matchedLength; k++) {
+          const a = norm(tokens[i - matchedLength + k]);
+          const b = norm(tokens[i + k]);
+          if (!a || !b || a !== b) {
+            isSame = false;
+            break;
+          }
+        }
+        if (isSame) {
+          i += matchedLength;
+        } else {
+          break;
+        }
+      }
+    } else {
+      result.push(tokens[i]);
+      i++;
+    }
+  }
+
+  return result.join(' ');
+}
 
 function isSpeechRecognitionSupported() {
   return ('SpeechRecognition' in window) || ('webkitSpeechRecognition' in window);
@@ -777,23 +847,51 @@ function initSpeechRecognition() {
   recognition.lang = 'pt-BR';
 
   recognition.onresult = (event) => {
-    let finalTranscript = '';
+    let interimTranscript = '';
 
     for (let i = event.resultIndex; i < event.results.length; ++i) {
-      if (event.results[i].isFinal) {
-        finalTranscript += event.results[i][0].transcript;
+      const res = event.results[i];
+      if (res.isFinal) {
+        const seg = (res[0] && res[0].transcript) ? res[0].transcript.trim() : '';
+        if (seg) {
+          sessionFinalizedSegments[i] = seg;
+        }
+      } else {
+        if (res[0] && res[0].transcript) {
+          interimTranscript += res[0].transcript;
+        }
       }
     }
 
-    const proc = document.getElementById('inputProcedureText');
-    if (!proc || !finalTranscript) return;
+    const currentSessionText = sessionFinalizedSegments.filter(Boolean).join(' ');
+    const cleanSessionText = deduplicateSpeechText(currentSessionText);
 
-    const current = proc.value.trim();
-    const newText = finalTranscript.trim();
-    proc.value = current ? `${current} ${newText}` : newText;
-    proc.classList.remove('is-invalid');
-    const err = document.getElementById('inputProcedureTextError');
-    if (err) err.classList.remove('active');
+    const proc = document.getElementById('inputProcedureText');
+    if (proc) {
+      if (cleanSessionText) {
+        const full = audioBaseProcedureText ? `${audioBaseProcedureText} ${cleanSessionText}` : cleanSessionText;
+        proc.value = deduplicateSpeechText(full);
+        proc.classList.remove('is-invalid');
+        const err = document.getElementById('inputProcedureTextError');
+        if (err) err.classList.remove('active');
+      }
+    }
+
+    // Atualiza feedback visual interino ao vivo
+    const liveBox = document.getElementById('audioLiveTranscriptBox');
+    const liveText = document.getElementById('audioLiveInterimText');
+    if (liveBox && liveText) {
+      const trimmedInterim = interimTranscript.trim();
+      if (trimmedInterim) {
+        liveText.textContent = trimmedInterim;
+        liveBox.style.display = 'flex';
+      } else if (!cleanSessionText) {
+        liveText.textContent = 'Ouvindo... pode falar...';
+        liveBox.style.display = 'flex';
+      } else {
+        liveBox.style.display = 'none';
+      }
+    }
   };
 
   recognition.onerror = (event) => {
@@ -805,12 +903,24 @@ function initSpeechRecognition() {
   };
 
   recognition.onend = () => {
+    // Quando o navegador pausa o reconhecimento por silêncio
+    const proc = document.getElementById('inputProcedureText');
+    if (proc) {
+      audioBaseProcedureText = deduplicateSpeechText(proc.value.trim());
+      sessionFinalizedSegments = [];
+    }
+
     if (isRecordingAudio) {
-      try {
-        recognition.start();
-      } catch (err) {
-        stopVoiceRecording();
-      }
+      if (audioRestartTimeout) clearTimeout(audioRestartTimeout);
+      audioRestartTimeout = setTimeout(() => {
+        if (isRecordingAudio) {
+          try {
+            recognition.start();
+          } catch (err) {
+            stopVoiceRecording();
+          }
+        }
+      }, 150);
     }
   };
 
@@ -832,6 +942,10 @@ function startVoiceRecording() {
   }
 
   try {
+    const proc = document.getElementById('inputProcedureText');
+    audioBaseProcedureText = proc ? deduplicateSpeechText(proc.value.trim()) : '';
+    sessionFinalizedSegments = [];
+
     if (!speechRecognition) {
       speechRecognition = initSpeechRecognition();
     }
@@ -842,10 +956,16 @@ function startVoiceRecording() {
     const btn = document.getElementById('btnVoiceRecord');
     const btnText = document.getElementById('voiceRecordText');
     const banner = document.getElementById('audioRecordIndicator');
+    const liveBox = document.getElementById('audioLiveTranscriptBox');
+    const liveText = document.getElementById('audioLiveInterimText');
 
     if (btn) btn.classList.add('recording-active');
     if (btnText) btnText.textContent = 'Parar Gravação';
     if (banner) banner.style.display = 'flex';
+    if (liveBox && liveText) {
+      liveText.textContent = 'Ouvindo... pode falar...';
+      liveBox.style.display = 'flex';
+    }
 
     audioRecordStartTime = Date.now();
     updateAudioRecordTimer();
@@ -869,6 +989,10 @@ function updateAudioRecordTimer() {
 
 function stopVoiceRecording() {
   isRecordingAudio = false;
+  if (audioRestartTimeout) {
+    clearTimeout(audioRestartTimeout);
+    audioRestartTimeout = null;
+  }
   if (audioRecordTimerInterval) {
     clearInterval(audioRecordTimerInterval);
     audioRecordTimerInterval = null;
@@ -880,22 +1004,38 @@ function stopVoiceRecording() {
     } catch (e) {}
   }
 
+  const proc = document.getElementById('inputProcedureText');
+  if (proc) {
+    proc.value = deduplicateSpeechText(proc.value.trim());
+  }
+
+  sessionFinalizedSegments = [];
+  audioBaseProcedureText = '';
+
   const btn = document.getElementById('btnVoiceRecord');
   const btnText = document.getElementById('voiceRecordText');
   const banner = document.getElementById('audioRecordIndicator');
+  const liveBox = document.getElementById('audioLiveTranscriptBox');
 
   if (btn) btn.classList.remove('recording-active');
   if (btnText) btnText.textContent = 'Falar por Áudio';
   if (banner) banner.style.display = 'none';
+  if (liveBox) liveBox.style.display = 'none';
 }
 
 async function refineProcedureTextWithAi() {
+  if (isRecordingAudio) {
+    stopVoiceRecording();
+  }
+
   const procInput = document.getElementById('inputProcedureText');
-  const draftText = procInput.value.trim();
+  const cleanDraft = deduplicateSpeechText(procInput.value.trim());
+  procInput.value = cleanDraft;
+
   const alertBox = document.getElementById('aiRefineStatus');
   alertBox.style.display = 'none';
 
-  if (!draftText) {
+  if (!cleanDraft) {
     alertBox.className = 'alert alert-error';
     alertBox.textContent = 'Digite ou dite por áudio as instruções ou observações da calibração antes de solicitar o aprimoramento da IA.';
     alertBox.style.display = 'block';
@@ -910,12 +1050,8 @@ async function refineProcedureTextWithAi() {
     return;
   }
 
-  if (isRecordingAudio) {
-    stopVoiceRecording();
-  }
-
   // Salva o rascunho anterior para permitir Desfazer
-  originalProcedureText = procInput.value;
+  originalProcedureText = cleanDraft;
 
   const btn = document.getElementById('btnAiRefinePop');
   const btnText = document.getElementById('aiRefineBtnText');

@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=3.2">
+  <link rel="stylesheet" href="/style.css?v=3.3">
 </head>
 <body class="lab-body">
 
@@ -592,6 +592,15 @@
             <span class="audio-record-hint">Fale como foi feita a calibração. A transcrição aparecerá no campo abaixo. Clique novamente no botão para encerrar.</span>
           </div>
 
+          <!-- Balão de transcrição interina ao vivo com microfone ativo -->
+          <div id="audioLiveTranscriptBox" class="audio-live-transcript" style="display: none;">
+            <span class="live-mic-tag">
+              <span class="live-pulse-dot"></span>
+              Ouvindo:
+            </span>
+            <span id="audioLiveInterimText" class="live-mic-phrase">...</span>
+          </div>
+
           <!-- Alerta de status do aprimoramento da IA -->
           <div id="aiRefineStatus" class="alert alert-info" style="display: none; margin-bottom: 12px;"></div>
 
@@ -811,6 +820,6 @@
     </div>
   </div>
 
-  <script src="/app.js?v=3.2"></script>
+  <script src="/app.js?v=3.3"></script>
 </body>
 </html>
