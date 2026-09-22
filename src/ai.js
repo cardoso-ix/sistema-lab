@@ -36,7 +36,7 @@ A partir do Fabricante e Modelo, localize as especificações técnicas oficiais
 Retorne ESTRITAMENTE um objeto JSON válido (sem blocos markdown adicionais ou texto explicativo antes ou depois) contendo obrigatoriamente as seguintes chaves:
 {
   "name": "Nome técnico formal completo do instrumento localizado (ex: Multímetro Digital Industrial True-RMS, Manômetro de Pressão Tubo de Bourdon, Termômetro Digital com Sonda PT100)",
-  "measurand": "Escolha exatamente uma opção dentre estas: Elétrica, Pressão, Temperatura, Dimensional, Massa / Balança, Frequência / Tempo, Óptica / Outras",
+  "measurand": "Escolha exatamente uma opção dentre estas: Elétrica, Pressão, Temperatura, Dimensional, Massa, Força e Torque, Vazão e Volume, Tempo e Frequência, Umidade, Acústica e Vibração, Óptica e Radiação, Físico-Química, Gás e Detecção, Outras",
   "range": "Faixas de medição nominais detalhadas e resolução de fábrica para o modelo ${model.trim()}",
   "typical_points": "Pontos nominais recomendados para a malha de calibração na bancada (especificar valores de teste numéricos reais para as escalas principais)",
   "procedure_text": "Roteiro Operacional Padrão (POP) passo a passo detalhado para o técnico executar na bancada:\\n1. Aclimatação e estabilização térmica (tempo e temperatura nominal)\\n2. Inspeção física, verificação de baterias/fusíveis e conexões corretas nos bornes/tomadas\\n3. Padrão de trabalho recomendado (ex: calibrador multifunção, balança de pressão, etc.)\\n4. Sequência de aplicação dos pontos ascendentes e descendentes com tempos de estabilização\\n5. Critérios de aceitação e tolerâncias recomendadas segundo especificações de fábrica"
@@ -92,9 +92,16 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem blocos markdown adicionais ou t
       'Pressão',
       'Temperatura',
       'Dimensional',
-      'Massa / Balança',
-      'Frequência / Tempo',
-      'Óptica / Outras'
+      'Massa',
+      'Força e Torque',
+      'Vazão e Volume',
+      'Tempo e Frequência',
+      'Umidade',
+      'Acústica e Vibração',
+      'Óptica e Radiação',
+      'Físico-Química',
+      'Gás e Detecção',
+      'Outras'
     ];
 
     let matchedMeasurand = validMeasurands.find(m => 
@@ -103,13 +110,20 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem blocos markdown adicionais ou t
 
     if (!matchedMeasurand) {
       const lower = (parsed.measurand || '').toLowerCase();
-      if (lower.includes('elét') || lower.includes('elet')) matchedMeasurand = 'Elétrica';
-      else if (lower.includes('press')) matchedMeasurand = 'Pressão';
-      else if (lower.includes('temp')) matchedMeasurand = 'Temperatura';
-      else if (lower.includes('dimens') || lower.includes('tam')) matchedMeasurand = 'Dimensional';
-      else if (lower.includes('massa') || lower.includes('pes') || lower.includes('balan')) matchedMeasurand = 'Massa / Balança';
-      else if (lower.includes('freq') || lower.includes('temp') || lower.includes('cron')) matchedMeasurand = 'Frequência / Tempo';
-      else matchedMeasurand = 'Óptica / Outras';
+      if (lower.includes('elét') || lower.includes('elet') || lower.includes('volt') || lower.includes('amper') || lower.includes('ohm')) matchedMeasurand = 'Elétrica';
+      else if (lower.includes('press') || lower.includes('vácuo') || lower.includes('vacuo') || lower.includes('bar') || lower.includes('psi')) matchedMeasurand = 'Pressão';
+      else if (lower.includes('temp') || lower.includes('grau') || lower.includes('termop') || lower.includes('pt100')) matchedMeasurand = 'Temperatura';
+      else if (lower.includes('umid') || lower.includes('higro') || lower.includes('ur%')) matchedMeasurand = 'Umidade';
+      else if (lower.includes('dimens') || lower.includes('tam') || lower.includes('paqu') || lower.includes('microm')) matchedMeasurand = 'Dimensional';
+      else if (lower.includes('massa') || lower.includes('pes') || lower.includes('balan')) matchedMeasurand = 'Massa';
+      else if (lower.includes('torqu') || lower.includes('forç') || lower.includes('forc') || lower.includes('dinam')) matchedMeasurand = 'Força e Torque';
+      else if (lower.includes('vaz') || lower.includes('volum') || lower.includes('flux') || lower.includes('pipet')) matchedMeasurand = 'Vazão e Volume';
+      else if (lower.includes('freq') || lower.includes('temp') || lower.includes('cron') || lower.includes('tac') || lower.includes('hz')) matchedMeasurand = 'Tempo e Frequência';
+      else if (lower.includes('acúst') || lower.includes('acust') || lower.includes('som') || lower.includes('vibr') || lower.includes('decib')) matchedMeasurand = 'Acústica e Vibração';
+      else if (lower.includes('óptic') || lower.includes('optic') || lower.includes('lux') || lower.includes('radia') || lower.includes('espect')) matchedMeasurand = 'Óptica e Radiação';
+      else if (lower.includes('ph') || lower.includes('condut') || lower.includes('viscos') || lower.includes('dens') || lower.includes('quim')) matchedMeasurand = 'Físico-Química';
+      else if (lower.includes('gás') || lower.includes('gas') || lower.includes('co2') || lower.includes('monit')) matchedMeasurand = 'Gás e Detecção';
+      else matchedMeasurand = 'Outras';
     }
 
     return {

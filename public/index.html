@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=3.1">
+  <link rel="stylesheet" href="/style.css?v=3.2">
 </head>
 <body class="lab-body">
 
@@ -215,6 +215,16 @@
             <button type="button" class="chip" data-measurand="Pressão">🧭 Pressão</button>
             <button type="button" class="chip" data-measurand="Temperatura">🌡️ Temperatura</button>
             <button type="button" class="chip" data-measurand="Dimensional">📏 Dimensional</button>
+            <button type="button" class="chip" data-measurand="Massa">⚖️ Massa & Balanças</button>
+            <button type="button" class="chip" data-measurand="Força e Torque">🔩 Força & Torque</button>
+            <button type="button" class="chip" data-measurand="Vazão e Volume">🧪 Vazão & Volume</button>
+            <button type="button" class="chip" data-measurand="Tempo e Frequência">⏱️ Tempo & Freq.</button>
+            <button type="button" class="chip" data-measurand="Umidade">💧 Umidade</button>
+            <button type="button" class="chip" data-measurand="Acústica e Vibração">🔊 Acústica & Vibração</button>
+            <button type="button" class="chip" data-measurand="Óptica e Radiação">💡 Óptica & Radiação</button>
+            <button type="button" class="chip" data-measurand="Físico-Química">🔬 Físico-Química</button>
+            <button type="button" class="chip" data-measurand="Gás e Detecção">🧯 Gás & Detecção</button>
+            <button type="button" class="chip" data-measurand="Outras">⚙️ Outras</button>
           </div>
 
           <button type="button" id="btnNewInstrument" class="btn btn-primary" style="display: none;" onclick="openInstrumentModal()">
@@ -500,13 +510,20 @@
           <div class="form-group col-4">
             <label for="inputMeasurand">Grandeza Metrológica <span class="req">*</span></label>
             <select id="inputMeasurand" required>
-              <option value="Elétrica">⚡ Elétrica</option>
-              <option value="Pressão">🧭 Pressão</option>
-              <option value="Temperatura">🌡️ Temperatura</option>
-              <option value="Dimensional">📏 Dimensional</option>
-              <option value="Massa / Balança">⚖️ Massa / Balança</option>
-              <option value="Frequência / Tempo">⏱️ Frequência / Tempo</option>
-              <option value="Óptica / Outras">🔬 Óptica / Outras</option>
+              <option value="Elétrica">⚡ Elétrica (Multímetros, Calibradores, Alicates, Fontes)</option>
+              <option value="Pressão">🧭 Pressão & Vácuo (Manômetros, Transmissores, Barômetros)</option>
+              <option value="Temperatura">🌡️ Temperatura (Termômetros, Termopares, PT100, Banhos)</option>
+              <option value="Dimensional">📏 Dimensional (Paquímetros, Micrômetros, Relógios, Blocos)</option>
+              <option value="Massa">⚖️ Massa & Balanças (Balanças Analíticas, Industriais, Pesos)</option>
+              <option value="Força e Torque">🔩 Força, Torque & Dureza (Torquímetros, Células, Dinamômetros)</option>
+              <option value="Vazão e Volume">🧪 Vazão, Volume & Fluidos (Medidores, Rotâmetros, Pipetas)</option>
+              <option value="Tempo e Frequência">⏱️ Tempo, Frequência & Rotação (Cronômetros, Tacômetros)</option>
+              <option value="Umidade">💧 Umidade (Termo-higrômetros, Sensores, Câmaras)</option>
+              <option value="Acústica e Vibração">🔊 Acústica & Vibração (Decibelímetros, Acelerômetros)</option>
+              <option value="Óptica e Radiação">💡 Óptica & Radiação (Luxímetros, Espectrofotômetros)</option>
+              <option value="Físico-Química">🔬 Físico-Química (pHmetros, Condutivímetros, Refratômetros)</option>
+              <option value="Gás e Detecção">🧯 Gás & Detecção (Detectores de Gás, Analisadores CO/O2)</option>
+              <option value="Outras">⚙️ Outras Grandezas / Especial</option>
             </select>
             <span class="field-error" id="inputMeasurandError"></span>
           </div>
@@ -794,6 +811,6 @@
     </div>
   </div>
 
-  <script src="/app.js?v=3.1"></script>
+  <script src="/app.js?v=3.2"></script>
 </body>
 </html>

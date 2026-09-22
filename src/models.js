@@ -199,8 +199,20 @@ function listInstruments(filters = {}) {
   const params = [];
 
   if (filters.measurand && filters.measurand.trim() !== '') {
-    sql += ' AND measurand = ?';
-    params.push(filters.measurand.trim());
+    const m = filters.measurand.trim();
+    if (m === 'Massa' || m === 'Massa / Balança') {
+      sql += ' AND (measurand = ? OR measurand = ?)';
+      params.push('Massa', 'Massa / Balança');
+    } else if (m === 'Tempo e Frequência' || m === 'Frequência / Tempo') {
+      sql += ' AND (measurand = ? OR measurand = ?)';
+      params.push('Tempo e Frequência', 'Frequência / Tempo');
+    } else if (m === 'Óptica e Radiação' || m === 'Óptica / Outras') {
+      sql += ' AND (measurand = ? OR measurand = ?)';
+      params.push('Óptica e Radiação', 'Óptica / Outras');
+    } else {
+      sql += ' AND measurand = ?';
+      params.push(m);
+    }
   }
 
   if (filters.query && filters.query.trim() !== '') {
