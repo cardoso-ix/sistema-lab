@@ -19,6 +19,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   await checkAuthSession();
 });
 
+function lockBodyScroll() {
+  document.body.classList.add('modal-open');
+}
+
+function unlockBodyScroll() {
+  setTimeout(() => {
+    const anyModalOpen = [
+      document.getElementById('detailModal'),
+      document.getElementById('formModal'),
+      document.getElementById('usersModal'),
+      document.getElementById('cameraModal'),
+      document.getElementById('photoLightbox')
+    ].some(m => m && m.style.display === 'flex');
+
+    if (!anyModalOpen) {
+      document.body.classList.remove('modal-open');
+    }
+  }, 40);
+}
+
 async function checkAuthSession() {
   if (!currentToken) {
     showLoginView();
@@ -67,6 +87,8 @@ function showAppView() {
   const isAdmin = currentUser.role === 'admin';
   document.getElementById('btnAdminPanel').style.display = isAdmin ? 'inline-flex' : 'none';
   document.getElementById('btnNewInstrument').style.display = isAdmin ? 'inline-flex' : 'none';
+  const mobileFab = document.getElementById('btnMobileFab');
+  if (mobileFab) mobileFab.style.display = isAdmin ? 'inline-flex' : 'none';
   const tecBadge = document.getElementById('tecnicoNoticeBadge');
   if (tecBadge) tecBadge.style.display = isAdmin ? 'none' : 'inline-flex';
 }
@@ -150,6 +172,9 @@ async function logout() {
   currentToken = null;
   currentUser = null;
   localStorage.removeItem('calibhub_token');
+  const mobileFab = document.getElementById('btnMobileFab');
+  if (mobileFab) mobileFab.style.display = 'none';
+  document.body.classList.remove('modal-open');
   showLoginView();
 }
 
@@ -286,6 +311,7 @@ async function openDetailModal(id) {
     setupDocTabView(item);
 
     document.getElementById('detailModal').style.display = 'flex';
+    lockBodyScroll();
   } catch (err) {
     alert(err.message);
   }
@@ -293,6 +319,7 @@ async function openDetailModal(id) {
 
 function closeDetailModal() {
   document.getElementById('detailModal').style.display = 'none';
+  unlockBodyScroll();
   activeInstrument = null;
 }
 
@@ -398,10 +425,12 @@ function zoomPhoto() {
   img.src = `/uploads/photos/${activeInstrument.photo_filename}`;
   caption.textContent = `${activeInstrument.manufacturer} ${activeInstrument.model} - TAG ${activeInstrument.tag}`;
   lightbox.style.display = 'flex';
+  lockBodyScroll();
 }
 
 function closeZoomPhoto() {
   document.getElementById('photoLightbox').style.display = 'none';
+  unlockBodyScroll();
 }
 
 // ============================================================
@@ -529,6 +558,7 @@ async function openCameraModal() {
   const modal = document.getElementById('cameraModal');
   const video = document.getElementById('cameraVideo');
   modal.style.display = 'flex';
+  lockBodyScroll();
 
   try {
     if (cameraStream) {
@@ -562,6 +592,7 @@ function closeCameraModal() {
   if (video) video.srcObject = null;
   const modal = document.getElementById('cameraModal');
   if (modal) modal.style.display = 'none';
+  unlockBodyScroll();
 }
 
 async function switchCameraFacingMode() {
@@ -682,6 +713,7 @@ function openInstrumentModal(itemToEdit = null) {
   }
 
   document.getElementById('formModal').style.display = 'flex';
+  lockBodyScroll();
   document.getElementById('inputTag').focus();
 }
 
@@ -689,6 +721,7 @@ function closeFormModal() {
   stopVoiceRecording();
   closeCameraModal();
   document.getElementById('formModal').style.display = 'none';
+  unlockBodyScroll();
 }
 
 function editCurrentInstrument() {
@@ -1118,6 +1151,7 @@ async function handleInstrumentSubmit(e) {
 
 async function openUsersModal() {
   document.getElementById('usersModal').style.display = 'flex';
+  lockBodyScroll();
   document.getElementById('userAlert').style.display = 'none';
   document.getElementById('newUserForm').reset();
   await loadUsersList();
@@ -1125,6 +1159,7 @@ async function openUsersModal() {
 
 function closeUsersModal() {
   document.getElementById('usersModal').style.display = 'none';
+  unlockBodyScroll();
 }
 
 async function loadUsersList() {

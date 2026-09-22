@@ -2746,19 +2746,365 @@ textarea:focus {
 }
 
 /* ============================================================ */
-/* OTIMIZAÇÕES MOBILE-FIRST (SMARTPHONE TOUCH & ERGONOMIA)      */
+/* ARQUITETURA MOBILE-FIRST (SMARTPHONE TOUCH & ERGONOMIA)      */
+/* Otimizações completas para uso em bancada via celular        */
+/* ============================================================ */
+
+/* Prevenção de rolagem fantasma no fundo quando modais estão abertos */
+body.modal-open {
+  overflow: hidden !important;
+  touch-action: none;
+}
+
+/* Floating Action Button (FAB) Flutuante para Celular */
+.mobile-fab {
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  right: 18px;
+  z-index: 80;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #ffffff;
+  padding: 13px 20px;
+  border-radius: 30px;
+  border: 1px solid var(--cyan-laser);
+  box-shadow: 0 8px 25px rgba(0, 240, 255, 0.4), 0 4px 14px rgba(0, 0, 0, 0.85);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  touch-action: manipulation;
+}
+
+.mobile-fab:active {
+  transform: scale(0.93);
+  box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3);
+}
+
+.fab-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--cyan-laser);
+}
+
+@media (min-width: 769px) {
+  .mobile-fab {
+    display: none !important;
+  }
+}
+
+/* ============================================================ */
+/* BREAKPOINT TABLET & SMARTPHONE (max-width: 768px)            */
 /* ============================================================ */
 
 @media (max-width: 768px) {
-  /* Evita zoom involuntário no iOS Safari mantendo fonte mínima 16px */
+  /* 1. Previne auto-zoom forçado do iOS Safari (fonte >= 16px) */
   input[type="text"],
   input[type="password"],
   select,
-  textarea {
+  textarea,
+  .code-editor-textarea {
+    font-size: 16px !important;
+    min-height: 48px;
+  }
+
+  /* 2. Tela de Login no Celular */
+  .auth-wrapper {
+    padding: 16px 14px calc(20px + env(safe-area-inset-bottom, 0px));
+    min-height: 100dvh;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .auth-card {
+    padding: 24px 18px 22px;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+    max-width: 100%;
+  }
+
+  .terminal-status-strip {
+    padding: 5px 8px;
+    margin-bottom: 16px;
+  }
+
+  .terminal-status-strip .status-text {
+    font-size: 8.5px;
+    letter-spacing: 0.03em;
+  }
+
+  .brand-logo {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 12px;
+    border-radius: 14px;
+  }
+
+  .logo-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .auth-title {
+    font-size: 24px;
+  }
+
+  .auth-subtitle {
+    font-size: 12px;
+    margin-top: 4px;
+  }
+
+  .auth-compliance-badges {
+    gap: 4px;
+    margin-top: 10px;
+  }
+
+  .lab-badge {
+    font-size: 9px;
+    padding: 2px 6px;
+  }
+
+  .hint-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .btn-chip {
+    padding: 9px 12px;
+    flex-direction: row;
+    justify-content: space-between;
+    min-height: 44px;
+  }
+
+  /* 3. Header Metrológico no Celular */
+  .app-header {
+    height: 58px;
+    padding: 0 12px;
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .header-brand {
+    gap: 10px;
+  }
+
+  .brand-badge-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+
+  .brand-icon {
+    width: 17px;
+    height: 17px;
+  }
+
+  .brand-name {
+    font-size: 16px;
+  }
+
+  .brand-sub {
+    display: none !important;
+  }
+
+  .header-right {
+    gap: 8px;
+  }
+
+  .user-profile-badge {
+    padding: 4px 8px 4px 4px;
+    gap: 6px;
+  }
+
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .header-actions {
+    gap: 6px;
+  }
+
+  .header-actions .btn-sm {
+    padding: 7px 10px;
+    min-height: 36px;
+  }
+
+  /* 4. Main & Trilha Deslizante de Indicadores (Stats) */
+  .app-main {
+    padding: 12px 12px calc(80px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .stats-overview {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 4px;
+  }
+
+  .stats-overview::-webkit-scrollbar {
+    display: none;
+  }
+
+  .stat-card {
+    flex: 0 0 78%;
+    min-width: 230px;
+    max-width: 280px;
+    scroll-snap-align: start;
+    padding: 12px 14px;
+    gap: 12px;
+    border-radius: 12px;
+  }
+
+  .stat-icon-wrapper {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+  }
+
+  .stat-icon-wrapper svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .stat-value {
+    font-size: 17px;
+  }
+
+  .stat-title {
+    font-size: 11px;
+  }
+
+  /* 5. Toolbar de Bancada: Busca & Grandezas Deslizantes */
+  .bench-toolbar {
+    margin-bottom: 18px;
+    gap: 12px;
+  }
+
+  .search-input-wrapper input {
+    height: 48px;
+    padding: 0 16px 0 44px;
+    border-radius: 12px;
     font-size: 16px !important;
   }
 
-  /* Modais em tela cheia fluida no celular */
+  .search-icon {
+    left: 14px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .search-shortcut {
+    display: none;
+  }
+
+  .toolbar-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .filter-chips {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 8px;
+    padding: 2px 2px 6px;
+    width: 100%;
+  }
+
+  .filter-chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chip {
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 8px 14px;
+    font-size: 12px;
+    border-radius: 20px;
+  }
+
+  #btnNewInstrument {
+    width: 100%;
+    min-height: 46px;
+    font-size: 13.5px;
+    border-radius: 10px;
+    justify-content: center;
+  }
+
+  #tecnicoNoticeBadge {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    font-size: 10.5px;
+    padding: 8px 10px;
+  }
+
+  /* 6. Catálogo de Equipamentos: Cards em Coluna Única */
+  .catalog-header {
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-size: 17px;
+  }
+
+  .instruments-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .instrument-card {
+    border-radius: 14px;
+    touch-action: manipulation;
+  }
+
+  .instrument-card:active {
+    transform: scale(0.98);
+  }
+
+  .card-photo-wrapper {
+    height: 185px;
+  }
+
+  .card-content {
+    padding: 14px 16px;
+  }
+
+  .card-title {
+    font-size: 16px;
+    line-height: 1.3;
+  }
+
+  .card-meta {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  .card-lcd-display {
+    padding: 8px 10px;
+    margin-bottom: 12px;
+  }
+
+  .card-footer {
+    padding-top: 10px;
+  }
+
+  /* 7. Modal de Detalhes: Cockpit de Bancada em Tela Cheia */
+  .modal-backdrop {
+    padding: 0 !important;
+  }
+
   .modal-dialog {
     width: 100vw !important;
     max-width: 100vw !important;
@@ -2769,59 +3115,378 @@ textarea:focus {
     border: none !important;
   }
 
+  .modal-header {
+    padding: 12px 14px;
+    min-height: 56px;
+    align-items: center;
+  }
+
+  .modal-title {
+    font-size: 17px;
+    line-height: 1.25;
+  }
+
+  .modal-subtitle {
+    font-size: 12px;
+  }
+
+  .modal-close {
+    font-size: 32px;
+    padding: 6px;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .detail-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    height: calc(100dvh - 56px) !important;
+  }
+
+  .detail-sidebar {
+    border-right: none !important;
+    border-bottom: 1px solid var(--border-lab) !important;
+    padding: 14px !important;
+    gap: 12px !important;
+    overflow: visible !important;
+    flex-shrink: 0;
+  }
+
+  .photo-container {
+    height: 200px;
+    border-radius: 10px;
+  }
+
+  .spec-card {
+    padding: 12px;
+  }
+
+  .quick-points-box {
+    padding: 12px;
+  }
+
+  .points-content {
+    max-height: 140px;
+    font-size: 11.5px;
+    padding: 10px;
+  }
+
+  .admin-detail-actions {
+    flex-direction: row !important;
+    gap: 8px !important;
+    padding-top: 12px !important;
+  }
+
+  .admin-detail-actions .btn {
+    flex: 1;
+    min-height: 42px;
+  }
+
+  .detail-main {
+    overflow: visible !important;
+    height: auto !important;
+    flex: 1;
+  }
+
+  .doc-tabs {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0 8px !important;
+    background: #070d1a !important;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .doc-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .doc-tab {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    padding: 12px 14px !important;
+    font-size: 12px !important;
+  }
+
+  .doc-tab-pane {
+    padding: 14px 12px 30px !important;
+    overflow: visible !important;
+  }
+
+  .procedure-text-view {
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 14px;
+    border-radius: 8px;
+  }
+
+  .pdf-viewer-container {
+    height: 65vh !important;
+    min-height: 400px;
+  }
+
+  /* 8. Modal de Cadastro/Edição de Instrumento */
   .modal-form {
-    max-height: calc(100dvh - 130px) !important;
-    padding: 16px 14px 10px !important;
+    padding: 14px 12px calc(90px + env(safe-area-inset-bottom, 0px)) !important;
+    max-height: calc(100dvh - 56px) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
   }
 
   .modal-form .form-row {
     flex-direction: column !important;
+    gap: 12px !important;
+    margin-bottom: 0 !important;
+  }
+
+  .modal-form .col-4,
+  .modal-form .col-6,
+  .modal-form .col-8 {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+    max-width: 100% !important;
+  }
+
+  .form-section-divider {
+    margin: 18px 0 14px;
+    font-size: 10.5px;
+  }
+
+  /* POP: Áudio & IA no Celular */
+  .procedure-editor-group {
+    padding: 12px 10px;
+  }
+
+  .procedure-editor-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
     gap: 10px !important;
   }
 
-  .modal-footer {
-    padding: 12px 14px !important;
-    background: #030814 !important;
-  }
-
-  .modal-footer .btn {
-    flex: 1 !important;
-    min-height: 48px !important;
-    font-size: 14px !important;
-  }
-
-  /* Botão de câmera em destaque no celular */
-  .btn-camera-trigger {
-    width: 100% !important;
-    min-height: 48px !important;
-    font-size: 14px !important;
-  }
-
-  .photo-capture-toolbar {
-    gap: 8px !important;
-  }
-
-  .btn-viewfinder-trigger,
-  .btn-gallery-trigger,
-  .btn-default-photo {
-    flex: 1 1 calc(50% - 6px) !important;
-    min-height: 42px !important;
-    justify-content: center !important;
-  }
-
-  /* Barra de Voz & IA no POP */
   .procedure-ai-actions {
+    display: flex !important;
+    gap: 8px !important;
     width: 100% !important;
-    margin-top: 8px !important;
   }
 
   .btn-voice-record,
   .btn-ai-refine {
     flex: 1 !important;
-    min-height: 44px !important;
+    min-height: 48px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
     justify-content: center !important;
   }
+
+  .btn-undo-text {
+    min-height: 48px !important;
+    padding: 0 12px !important;
+  }
+
+  .procedure-quick-snippets {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 6px;
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+  }
+
+  .procedure-quick-snippets::-webkit-scrollbar {
+    display: none;
+  }
+
+  .btn-snippet {
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 7px 12px;
+    font-size: 11.5px;
+  }
+
+  .procedure-large-textarea {
+    min-height: 190px !important;
+    height: 220px !important;
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Câmera Mobile-First: Botão Principal 'Tirar Foto na Hora' em destaque */
+  .btn-camera-trigger {
+    width: 100% !important;
+    min-height: 52px !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    border-radius: 10px !important;
+  }
+
+  .btn-cam-icon {
+    font-size: 18px !important;
+  }
+
+  .photo-capture-toolbar {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 6px !important;
+  }
+
+  .photo-capture-toolbar .btn-camera-trigger {
+    grid-column: 1 / -1 !important;
+  }
+
+  .btn-viewfinder-trigger,
+  .btn-gallery-trigger,
+  .btn-default-photo {
+    min-height: 42px !important;
+    font-size: 11.5px !important;
+    padding: 8px 4px !important;
+    justify-content: center !important;
+    width: 100% !important;
+  }
+
+  .photo-preview-card {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px;
+  }
+
+  .photo-preview-thumb-box {
+    width: 100%;
+    height: 160px;
+  }
+
+  .photo-preview-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .photo-preview-actions button {
+    flex: 1;
+    min-height: 42px;
+    justify-content: center;
+  }
+
+  /* Rodapé Fixo na Base da Tela do Celular */
+  .modal-footer {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: rgba(3, 8, 20, 0.98) !important;
+    backdrop-filter: blur(14px) !important;
+    border-top: 1px solid var(--border-lab) !important;
+    padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+    z-index: 60 !important;
+    margin: 0 !important;
+    display: flex !important;
+    gap: 10px !important;
+  }
+
+  .modal-footer .btn {
+    min-height: 48px !important;
+    font-size: 14px !important;
+    flex: 1 !important;
+  }
+
+  .modal-footer #btnSaveInstrument {
+    flex: 2 !important;
+  }
+
+  /* 9. Visor da Câmera em Tela Cheia */
+  .camera-container {
+    max-width: 100vw;
+    height: 100dvh;
+  }
+
+  .camera-top-bar {
+    padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 12px;
+  }
+
+  .camera-bottom-bar {
+    padding: 20px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .btn-camera-shutter {
+    width: 76px;
+    height: 76px;
+  }
+
+  .shutter-circle {
+    width: 60px;
+    height: 60px;
+  }
+
+  /* 10. Gestão de Metrologistas no Celular */
+  .create-user-box {
+    padding: 14px;
+  }
+
+  .user-inline-form {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .user-inline-form .align-end {
+    margin-top: 4px;
+  }
+
+  .user-inline-form .btn {
+    width: 100%;
+    min-height: 46px;
+  }
+
+  .users-table-container {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 10px 12px;
+    white-space: nowrap;
+  }
 }
+
+/* ============================================================ */
+/* SMARTPHONES PEQUENOS (max-width: 480px)                      */
+/* Otimizações extremas de densidade de tela                    */
+/* ============================================================ */
+
+@media (max-width: 480px) {
+  .user-name {
+    display: none !important;
+  }
+
+  .header-actions #btnAdminPanel span,
+  .header-actions #btnLogout span {
+    display: none !important;
+  }
+
+  .header-actions .btn-sm {
+    width: 38px;
+    height: 38px;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .brand-name {
+    font-size: 15px;
+  }
+}
+
 
 
 
