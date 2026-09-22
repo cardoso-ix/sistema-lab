@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=3.4">
+  <link rel="stylesheet" href="/style.css?v=3.5">
 </head>
 <body class="lab-body">
 
@@ -614,7 +614,7 @@
         </div>
 
         <div class="form-row">
-          <div class="form-group col-6 photo-field-group">
+          <div class="form-group col-12 photo-field-group">
             <div class="photo-field-header">
               <label class="photo-field-title">
                 <span>📷 Foto do Equipamento</span>
@@ -639,7 +639,6 @@
                   <span class="action-title">Foto com Enquadramento</span>
                   <span class="action-desc">Câmera com retícula de precisão</span>
                 </div>
-                <span class="action-badge pro">PRO</span>
               </button>
 
               <button type="button" class="btn-choose-file-action" onclick="triggerGalleryPicker()" title="Selecionar imagem ou foto salva no computador ou celular">
@@ -650,7 +649,6 @@
                   <span class="action-title">Escolher Arquivo</span>
                   <span class="action-desc" id="photoFileNameBadge">JPG, PNG ou WEBP</span>
                 </div>
-                <span class="action-badge">ARQUIVO</span>
               </button>
             </div>
 
@@ -676,23 +674,24 @@
               </div>
             </div>
           </div>
-
-          <div class="form-group col-6">
-            <label for="inputCert">PDF do Último Certificado (Opcional)</label>
-            <input type="file" id="inputCert" accept="application/pdf">
-            <span class="field-hint">Certificado anterior para visualização dos pontos e incertezas</span>
-            <span class="field-error" id="inputCertError"></span>
-          </div>
         </div>
 
+        <!-- Documentação Técnica Anexa (PDFs) -->
         <div class="form-row">
-          <div class="form-group col-6">
+          <div class="form-group col-4">
+            <label for="inputCert">PDF do Último Certificado (Opcional)</label>
+            <input type="file" id="inputCert" accept="application/pdf">
+            <span class="field-hint">Certificado anterior (.pdf)</span>
+            <span class="field-error" id="inputCertError"></span>
+          </div>
+
+          <div class="form-group col-4">
             <label for="inputManual">PDF do Manual Técnico (Opcional)</label>
             <input type="file" id="inputManual" accept="application/pdf">
             <span class="field-hint">Manual do fabricante (.pdf)</span>
           </div>
 
-          <div class="form-group col-6">
+          <div class="form-group col-4">
             <label for="inputProcedure">PDF do Procedimento/POP (Opcional)</label>
             <input type="file" id="inputProcedure" accept="application/pdf">
             <span class="field-hint">Documento formal do POP (.pdf)</span>
@@ -823,6 +822,6 @@
     </div>
   </div>
 
-  <script src="/app.js?v=3.4"></script>
+  <script src="/app.js?v=3.5"></script>
 </body>
 </html>

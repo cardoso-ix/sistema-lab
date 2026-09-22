@@ -1451,6 +1451,7 @@ body.theme-light textarea {
 .col-4 { flex: 4; }
 .col-6 { flex: 6; }
 .col-8 { flex: 8; }
+.col-12 { flex: 12; width: 100%; }
 
 .form-group {
   display: flex;
@@ -2374,19 +2375,20 @@ textarea:focus {
 /* Nova Grade Profissional de Foto: Enquadramento & Escolher Arquivo */
 .photo-capture-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
   margin-bottom: 12px;
+  width: 100%;
 }
 
 .btn-framing-action {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   background: linear-gradient(135deg, rgba(5, 150, 105, 0.22) 0%, rgba(2, 132, 199, 0.28) 100%);
-  border: 1px solid rgba(16, 185, 129, 0.55);
+  border: 1.5px solid rgba(16, 185, 129, 0.6);
   border-radius: var(--radius-sm);
-  padding: 12px 14px;
+  padding: 14px 18px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
@@ -2394,43 +2396,47 @@ textarea:focus {
   position: relative;
   overflow: hidden;
   box-shadow: 0 0 16px rgba(16, 185, 129, 0.18);
+  min-height: 64px;
+  box-sizing: border-box;
 }
 
 .btn-framing-action:hover {
   background: linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(2, 132, 199, 0.45) 100%);
   border-color: #10b981;
-  box-shadow: 0 0 24px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.45);
   transform: translateY(-1px);
 }
 
 .btn-choose-file-action {
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px dashed rgba(0, 240, 255, 0.4);
+  gap: 14px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1.5px dashed rgba(0, 240, 255, 0.45);
   border-radius: var(--radius-sm);
-  padding: 12px 14px;
+  padding: 14px 18px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
   font-family: var(--font-sans);
   position: relative;
   box-shadow: 0 0 16px rgba(0, 240, 255, 0.1);
+  min-height: 64px;
+  box-sizing: border-box;
 }
 
 .btn-choose-file-action:hover {
   background: rgba(0, 240, 255, 0.08);
   border-color: var(--cyan-laser);
   border-style: solid;
-  box-shadow: 0 0 22px rgba(0, 240, 255, 0.3);
+  box-shadow: 0 0 22px rgba(0, 240, 255, 0.35);
   transform: translateY(-1px);
 }
 
 .action-icon-box {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2439,18 +2445,18 @@ textarea:focus {
 
 .action-icon-box.framing {
   background: rgba(16, 185, 129, 0.25);
-  border: 1px solid rgba(16, 185, 129, 0.6);
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+  border: 1px solid rgba(16, 185, 129, 0.65);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
 }
 
 .action-icon-box.file {
   background: rgba(0, 240, 255, 0.18);
-  border: 1px solid rgba(0, 240, 255, 0.5);
+  border: 1px solid rgba(0, 240, 255, 0.55);
   box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
 }
 
 .action-icon {
-  font-size: 20px;
+  font-size: 22px;
   line-height: 1;
 }
 
@@ -2463,36 +2469,19 @@ textarea:focus {
 }
 
 .action-title {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   color: #ffffff;
   letter-spacing: 0.2px;
+  white-space: nowrap;
 }
 
 .action-desc {
-  font-size: 11px;
+  font-size: 11.5px;
   color: #94a3b8;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.action-badge {
-  font-size: 9.5px;
-  font-weight: 700;
-  padding: 3px 6px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #cbd5e1;
-  font-family: var(--font-mono);
-  letter-spacing: 0.5px;
-  align-self: flex-start;
-}
-
-.action-badge.pro {
-  background: rgba(16, 185, 129, 0.3);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.5);
 }
 
 /* Estilização moderna e profissional para campos nativos de Escolher Arquivo (PDF e Documentos) */
