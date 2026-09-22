@@ -530,6 +530,11 @@ async function handlePhotoFileSelected(file) {
       metaText.textContent = `Tamanho otimizado: ${sizeKb} KB (Pronta para envio rápido)`;
     }
 
+    const badge = document.getElementById('photoFileNameBadge');
+    if (badge) {
+      badge.textContent = file.name || 'Foto selecionada';
+    }
+
     document.getElementById('usingDefaultPhoto').value = 'false';
 
     const errorSpan = document.getElementById('inputPhotoError');
@@ -646,6 +651,9 @@ function clearSelectedPhoto() {
   if (previewImg) previewImg.src = '';
   if (previewContainer) previewContainer.style.display = 'none';
 
+  const badge = document.getElementById('photoFileNameBadge');
+  if (badge) badge.textContent = 'JPG, PNG ou WEBP';
+
   const defPhotoEl = document.getElementById('usingDefaultPhoto');
   if (defPhotoEl) defPhotoEl.value = 'false';
 
@@ -705,6 +713,8 @@ function openInstrumentModal(itemToEdit = null) {
       if (statusText) statusText.textContent = 'Foto Cadastrada do Instrumento';
       const metaText = document.getElementById('photoPreviewMeta');
       if (metaText) metaText.textContent = `${itemToEdit.manufacturer} ${itemToEdit.model}`;
+      const badge = document.getElementById('photoFileNameBadge');
+      if (badge) badge.textContent = itemToEdit.photo_filename;
     }
   } else {
     title.textContent = 'Cadastrar Novo Instrumento de Bancada';

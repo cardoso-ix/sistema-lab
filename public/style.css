@@ -2371,101 +2371,173 @@ textarea:focus {
   gap: 6px;
 }
 
-.photo-capture-toolbar {
+/* Nova Grade Profissional de Foto: Enquadramento & Escolher Arquivo */
+.photo-capture-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.btn-framing-action {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
-}
-
-.btn-camera-trigger {
-  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: linear-gradient(135deg, #059669 0%, #0284c7 100%);
-  border: 1px solid #10b981;
-  color: #ffffff;
-  padding: 10px 16px;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.22) 0%, rgba(2, 132, 199, 0.28) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.55);
   border-radius: var(--radius-sm);
-  font-size: 13px;
-  font-weight: 700;
+  padding: 12px 14px;
   cursor: pointer;
-  box-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
   transition: all 0.2s ease;
+  text-align: left;
   font-family: var(--font-sans);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.18);
 }
 
-.btn-camera-trigger:hover {
-  background: linear-gradient(135deg, #10b981 0%, #0369a1 100%);
-  box-shadow: 0 0 25px rgba(16, 185, 129, 0.55);
+.btn-framing-action:hover {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(2, 132, 199, 0.45) 100%);
+  border-color: #10b981;
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.4);
   transform: translateY(-1px);
 }
 
-.btn-cam-icon {
-  font-size: 16px;
+.btn-choose-file-action {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px dashed rgba(0, 240, 255, 0.4);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-family: var(--font-sans);
+  position: relative;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.1);
+}
+
+.btn-choose-file-action:hover {
+  background: rgba(0, 240, 255, 0.08);
+  border-color: var(--cyan-laser);
+  border-style: solid;
+  box-shadow: 0 0 22px rgba(0, 240, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.action-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.action-icon-box.framing {
+  background: rgba(16, 185, 129, 0.25);
+  border: 1px solid rgba(16, 185, 129, 0.6);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+}
+
+.action-icon-box.file {
+  background: rgba(0, 240, 255, 0.18);
+  border: 1px solid rgba(0, 240, 255, 0.5);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
+}
+
+.action-icon {
+  font-size: 20px;
   line-height: 1;
 }
 
-.btn-viewfinder-trigger {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(0, 240, 255, 0.12);
-  border: 1px solid rgba(0, 240, 255, 0.35);
-  color: var(--cyan-laser);
-  padding: 9px 13px;
-  border-radius: var(--radius-sm);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
+.action-text-box {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
 }
 
-.btn-viewfinder-trigger:hover {
-  background: rgba(0, 240, 255, 0.22);
-  border-color: var(--cyan-laser);
-}
-
-.btn-gallery-trigger {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #152238;
-  border: 1px solid var(--border-lab);
-  color: #cbd5e1;
-  padding: 9px 13px;
-  border-radius: var(--radius-sm);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-gallery-trigger:hover {
-  background: #1f3152;
-  border-color: #38bdf8;
+.action-title {
+  font-size: 13px;
+  font-weight: 700;
   color: #ffffff;
+  letter-spacing: 0.2px;
 }
 
-.btn-default-photo {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  color: #fbbf24;
-  padding: 9px 12px;
+.action-desc {
+  font-size: 11px;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.action-badge {
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  font-family: var(--font-mono);
+  letter-spacing: 0.5px;
+  align-self: flex-start;
+}
+
+.action-badge.pro {
+  background: rgba(16, 185, 129, 0.3);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.5);
+}
+
+/* Estilização moderna e profissional para campos nativos de Escolher Arquivo (PDF e Documentos) */
+input[type="file"] {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(10, 16, 30, 0.75);
+  border: 1px dashed rgba(0, 240, 255, 0.3);
   border-radius: var(--radius-sm);
-  font-size: 11.5px;
-  font-weight: 600;
+  color: #94a3b8;
+  font-size: 12px;
+  font-family: var(--font-sans);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  min-height: 42px;
+  box-sizing: border-box;
 }
 
-.btn-default-photo:hover {
-  background: rgba(245, 158, 11, 0.22);
-  border-color: #f59e0b;
+input[type="file"]:hover {
+  border-color: var(--cyan-laser);
+  border-style: solid;
+  background: rgba(0, 240, 255, 0.05);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.18);
+}
+
+input[type="file"]::file-selector-button {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.2) 0%, rgba(14, 165, 233, 0.3) 100%);
+  border: 1px solid var(--cyan-laser);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 11.5px;
+  padding: 6px 14px;
+  border-radius: var(--radius-xs);
+  margin-right: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-sans);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.38) 0%, rgba(14, 165, 233, 0.48) 100%);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.5);
+  transform: translateY(-0.5px);
 }
 
 /* Card de Prévia & Confirmação da Foto */
@@ -2647,17 +2719,42 @@ textarea:focus {
   object-fit: cover;
 }
 
-/* Retículo de Alinhamento de Instrumento */
+/* Retículo de Alinhamento e Enquadramento de Instrumento */
 .camera-target-reticle {
   position: absolute;
-  inset: 12% 8%;
+  inset: 10% 8%;
   pointer-events: none;
-  border: 1px dashed rgba(0, 240, 255, 0.35);
+  border: 1px dashed rgba(0, 240, 255, 0.45);
   border-radius: 14px;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding-bottom: 14px;
+  padding-bottom: 16px;
+  box-shadow: inset 0 0 50px rgba(0, 240, 255, 0.08);
+}
+
+.camera-target-reticle::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 36px;
+  height: 2px;
+  background: rgba(0, 240, 255, 0.5);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.camera-target-reticle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2px;
+  height: 36px;
+  background: rgba(0, 240, 255, 0.5);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 .reticle-corner {
@@ -3316,37 +3413,26 @@ body.modal-open {
     line-height: 1.5 !important;
   }
 
-  /* Câmera Mobile-First: Botão Principal 'Tirar Foto na Hora' em destaque */
-  .btn-camera-trigger {
+  /* Foto Mobile-First: Grade com Foto de Enquadramento e Escolher Arquivo */
+  .photo-capture-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .btn-framing-action,
+  .btn-choose-file-action {
     width: 100% !important;
-    min-height: 52px !important;
-    font-size: 15px !important;
-    font-weight: 700 !important;
+    min-height: 54px !important;
+    padding: 12px 14px !important;
     border-radius: 10px !important;
   }
 
-  .btn-cam-icon {
-    font-size: 18px !important;
+  .action-title {
+    font-size: 13.5px !important;
   }
 
-  .photo-capture-toolbar {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr 1fr !important;
-    gap: 6px !important;
-  }
-
-  .photo-capture-toolbar .btn-camera-trigger {
-    grid-column: 1 / -1 !important;
-  }
-
-  .btn-viewfinder-trigger,
-  .btn-gallery-trigger,
-  .btn-default-photo {
-    min-height: 42px !important;
-    font-size: 11.5px !important;
-    padding: 8px 4px !important;
-    justify-content: center !important;
-    width: 100% !important;
+  .action-desc {
+    font-size: 11px !important;
   }
 
   .photo-preview-card {

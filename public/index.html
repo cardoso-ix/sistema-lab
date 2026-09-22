@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=3.3">
+  <link rel="stylesheet" href="/style.css?v=3.4">
 </head>
 <body class="lab-body">
 
@@ -629,25 +629,28 @@
             <input type="file" id="inputPhoto" accept="image/jpeg,image/png,image/webp,image/jpg" style="display: none;">
             <input type="hidden" id="usingDefaultPhoto" value="false">
 
-            <!-- Barra de Ações Rápidas de Foto (Mobile-First) -->
-            <div class="photo-capture-toolbar">
-              <button type="button" class="btn-camera-trigger" onclick="triggerNativeCamera()" title="Tirar foto agora usando a câmera do celular">
-                <span class="btn-cam-icon">📸</span>
-                <span class="btn-cam-text">Tirar Foto na Hora</span>
+            <!-- Barra de Ações de Foto: Foto com Enquadramento & Escolher Arquivo -->
+            <div class="photo-capture-grid">
+              <button type="button" class="btn-framing-action" onclick="openCameraModal()" title="Abrir câmera com guias de enquadramento metrológico para fotografar o instrumento">
+                <div class="action-icon-box framing">
+                  <span class="action-icon">🎯</span>
+                </div>
+                <div class="action-text-box">
+                  <span class="action-title">Foto com Enquadramento</span>
+                  <span class="action-desc">Câmera com retícula de precisão</span>
+                </div>
+                <span class="action-badge pro">PRO</span>
               </button>
 
-              <button type="button" class="btn-viewfinder-trigger" onclick="openCameraModal()" title="Abrir visor da câmera na tela para enquadrar">
-                <span>👁️</span>
-                <span>Visor ao Vivo</span>
-              </button>
-
-              <button type="button" class="btn-gallery-trigger" onclick="triggerGalleryPicker()" title="Escolher arquivo ou foto já existente na galeria">
-                <span>📁</span>
-                <span>Galeria</span>
-              </button>
-
-              <button type="button" class="btn-default-photo" onclick="useDefaultPhoto()" title="Preencher com foto padrão de instrumento de bancada">
-                <span>⚡ Foto Padrão</span>
+              <button type="button" class="btn-choose-file-action" onclick="triggerGalleryPicker()" title="Selecionar imagem ou foto salva no computador ou celular">
+                <div class="action-icon-box file">
+                  <span class="action-icon">📁</span>
+                </div>
+                <div class="action-text-box">
+                  <span class="action-title">Escolher Arquivo</span>
+                  <span class="action-desc" id="photoFileNameBadge">JPG, PNG ou WEBP</span>
+                </div>
+                <span class="action-badge">ARQUIVO</span>
               </button>
             </div>
 
@@ -663,8 +666,8 @@
                 <div class="photo-preview-title" id="photoPreviewStatusText">Foto do equipamento anexada</div>
                 <div class="photo-preview-details" id="photoPreviewMeta">Pronta para o cadastro</div>
                 <div class="photo-preview-actions">
-                  <button type="button" class="btn-retake-photo" onclick="triggerNativeCamera()">
-                    <span>🔄 Tirar Outra</span>
+                  <button type="button" class="btn-retake-photo" onclick="openCameraModal()" title="Capturar nova foto com o visor de enquadramento">
+                    <span>🎯 Nova Foto</span>
                   </button>
                   <button type="button" class="btn-remove-photo" onclick="clearSelectedPhoto()">
                     <span>✕ Remover</span>
@@ -798,7 +801,7 @@
           <div class="reticle-corner top-right"></div>
           <div class="reticle-corner bottom-left"></div>
           <div class="reticle-corner bottom-right"></div>
-          <div class="reticle-hint">Enquadre o instrumento na câmera</div>
+          <div class="reticle-hint">🎯 Enquadramento Metrológico • Centralize o Instrumento</div>
         </div>
       </div>
 
@@ -820,6 +823,6 @@
     </div>
   </div>
 
-  <script src="/app.js?v=3.3"></script>
+  <script src="/app.js?v=3.4"></script>
 </body>
 </html>
