@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=3.5">
+  <link rel="stylesheet" href="/style.css?v=3.6">
 </head>
 <body class="lab-body">
 
@@ -209,22 +209,41 @@
         </div>
 
         <div class="toolbar-actions">
-          <div class="filter-chips" id="filterChips">
-            <button type="button" class="chip active" data-measurand="">Todas as Grandezas</button>
-            <button type="button" class="chip" data-measurand="Elétrica">⚡ Elétrica</button>
-            <button type="button" class="chip" data-measurand="Pressão">🧭 Pressão</button>
-            <button type="button" class="chip" data-measurand="Temperatura">🌡️ Temperatura</button>
-            <button type="button" class="chip" data-measurand="Dimensional">📏 Dimensional</button>
-            <button type="button" class="chip" data-measurand="Massa">⚖️ Massa & Balanças</button>
-            <button type="button" class="chip" data-measurand="Força e Torque">🔩 Força & Torque</button>
-            <button type="button" class="chip" data-measurand="Vazão e Volume">🧪 Vazão & Volume</button>
-            <button type="button" class="chip" data-measurand="Tempo e Frequência">⏱️ Tempo & Freq.</button>
-            <button type="button" class="chip" data-measurand="Umidade">💧 Umidade</button>
-            <button type="button" class="chip" data-measurand="Acústica e Vibração">🔊 Acústica & Vibração</button>
-            <button type="button" class="chip" data-measurand="Óptica e Radiação">💡 Óptica & Radiação</button>
-            <button type="button" class="chip" data-measurand="Físico-Química">🔬 Físico-Química</button>
-            <button type="button" class="chip" data-measurand="Gás e Detecção">🧯 Gás & Detecção</button>
-            <button type="button" class="chip" data-measurand="Outras">⚙️ Outras</button>
+          <div class="measurand-filter-box" id="measurandFilterBox">
+            <label for="measurandSelectFilter" class="measurand-filter-flag">
+              <span class="flag-icon">🏷️</span>
+              <span class="flag-text">Grandeza:</span>
+            </label>
+            <div class="measurand-select-wrapper">
+              <select id="measurandSelectFilter" class="measurand-select" aria-label="Filtrar por Grandeza Metrológica">
+                <option value="">Todas as Grandezas (14)</option>
+                <option value="Elétrica">⚡ Elétrica</option>
+                <option value="Pressão">🧭 Pressão</option>
+                <option value="Temperatura">🌡️ Temperatura</option>
+                <option value="Dimensional">📏 Dimensional</option>
+                <option value="Massa">⚖️ Massa &amp; Balanças</option>
+                <option value="Força e Torque">🔩 Força &amp; Torque</option>
+                <option value="Vazão e Volume">🧪 Vazão &amp; Volume</option>
+                <option value="Tempo e Frequência">⏱️ Tempo &amp; Freq.</option>
+                <option value="Umidade">💧 Umidade</option>
+                <option value="Acústica e Vibração">🔊 Acústica &amp; Vibração</option>
+                <option value="Óptica e Radiação">💡 Óptica &amp; Radiação</option>
+                <option value="Físico-Química">🔬 Físico-Química</option>
+                <option value="Gás e Detecção">🧯 Gás &amp; Detecção</option>
+                <option value="Outras">⚙️ Outras</option>
+              </select>
+              <span class="measurand-select-chevron" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </span>
+            </div>
+            <button type="button" id="btnClearMeasurandFilter" class="btn-clear-measurand" title="Limpar filtro e ver todas as grandezas" style="display: none;" onclick="clearMeasurandFilter()">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
           </div>
 
           <button type="button" id="btnNewInstrument" class="btn btn-primary" style="display: none;" onclick="openInstrumentModal()">
@@ -822,6 +841,6 @@
     </div>
   </div>
 
-  <script src="/app.js?v=3.5"></script>
+  <script src="/app.js?v=3.6"></script>
 </body>
 </html>

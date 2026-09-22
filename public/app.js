@@ -182,6 +182,41 @@ async function logout() {
 // CARREGAMENTO & FILTRAGEM DE INSTRUMENTOS
 // ============================================================
 
+function updateMeasurandFilterUI() {
+  const measurandSelect = document.getElementById('measurandSelectFilter');
+  const clearBtn = document.getElementById('btnClearMeasurandFilter');
+  const filterBox = document.getElementById('measurandFilterBox');
+  const val = measurandSelect ? measurandSelect.value : '';
+
+  if (val) {
+    if (clearBtn) clearBtn.style.display = 'inline-flex';
+    if (filterBox) filterBox.classList.add('has-active-filter');
+  } else {
+    if (clearBtn) clearBtn.style.display = 'none';
+    if (filterBox) filterBox.classList.remove('has-active-filter');
+  }
+}
+
+function clearMeasurandFilter() {
+  const measurandSelect = document.getElementById('measurandSelectFilter');
+  if (measurandSelect) {
+    measurandSelect.value = '';
+  }
+  activeMeasurandFilter = '';
+  updateMeasurandFilterUI();
+  loadInstruments();
+}
+
+function setMeasurandFilter(measurand) {
+  const measurandSelect = document.getElementById('measurandSelectFilter');
+  if (measurandSelect) {
+    measurandSelect.value = measurand || '';
+  }
+  activeMeasurandFilter = measurand || '';
+  updateMeasurandFilterUI();
+  loadInstruments();
+}
+
 async function loadInstruments() {
   const query = document.getElementById('searchInput').value.trim();
   let url = `/api/instruments?query=${encodeURIComponent(query)}`;
@@ -216,7 +251,11 @@ function renderInstrumentsGrid() {
   grid.innerHTML = '';
 
   const total = instrumentsList.length;
-  countLabel.textContent = `${total} instrumento${total === 1 ? '' : 's'} cadastrado${total === 1 ? '' : 's'}`;
+  if (activeMeasurandFilter) {
+    countLabel.textContent = `${total} instrumento${total === 1 ? '' : 's'} (${activeMeasurandFilter})`;
+  } else {
+    countLabel.textContent = `${total} instrumento${total === 1 ? '' : 's'} cadastrado${total === 1 ? '' : 's'}`;
+  }
   if (statTotal) statTotal.textContent = total;
 
   if (total === 0) {
@@ -1447,16 +1486,15 @@ function setupEventListeners() {
     }
   });
 
-  // Filtros por Grandeza
-  const filterChips = document.getElementById('filterChips');
-  filterChips.addEventListener('click', (e) => {
-    const chip = e.target.closest('.chip');
-    if (!chip) return;
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-    activeMeasurandFilter = chip.getAttribute('data-measurand') || '';
-    loadInstruments();
-  });
+  // Filtro por Grandeza Metrológica (Seletor Flag Despoluído)
+  const measurandSelect = document.getElementById('measurandSelectFilter');
+  if (measurandSelect) {
+    measurandSelect.addEventListener('change', (e) => {
+      activeMeasurandFilter = e.target.value || '';
+      updateMeasurandFilterUI();
+      loadInstruments();
+    });
+  }
 
   // Disparadores de foto (Câmera do celular, Galeria e Seletor padrão)
   const camInput = document.getElementById('inputPhotoCamera');

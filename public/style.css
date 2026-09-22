@@ -771,34 +771,137 @@ body.theme-light textarea {
   gap: 12px;
 }
 
-.filter-chips {
-  display: flex;
+/* ============================================================ */
+/* SELETOR DE GRANDEZAS (FLAG / DROPDOWN COMPACTO LIMPO)       */
+/* ============================================================ */
+
+.measurand-filter-box {
+  display: inline-flex;
+  align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
-}
-
-.chip {
-  background: var(--bg-card);
+  background: rgba(13, 21, 38, 0.75);
   border: 1px solid var(--border-lab);
-  color: var(--text-muted);
-  font-size: 13px;
-  padding: 8px 16px;
+  padding: 6px 12px;
   border-radius: 24px;
-  cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+  position: relative;
 }
 
-.chip:hover {
-  border-color: #2e4370;
-  color: #ffffff;
+.measurand-filter-box:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15);
 }
 
-.chip.active {
-  background: linear-gradient(135deg, #0284c7, #0369a1);
+.measurand-filter-box.has-active-filter {
   border-color: var(--cyan-laser);
-  color: white;
+  background: rgba(2, 132, 199, 0.12);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.22);
+}
+
+.measurand-filter-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.measurand-filter-flag .flag-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.measurand-filter-flag .flag-text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.measurand-filter-box.has-active-filter .measurand-filter-flag .flag-text {
+  color: var(--cyan-laser);
+}
+
+.measurand-select-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.measurand-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: transparent;
+  border: none;
+  color: #f1f5f9;
+  font-family: var(--font-sans);
+  font-size: 13px;
   font-weight: 600;
-  box-shadow: 0 0 14px var(--cyan-glow);
+  padding: 4px 26px 4px 6px;
+  cursor: pointer;
+  outline: none;
+  border-radius: 6px;
+}
+
+.measurand-select:focus {
+  outline: none;
+}
+
+.measurand-select option {
+  background: #0b1326;
+  color: #f8fafc;
+  font-size: 13px;
+  padding: 8px 12px;
+}
+
+.measurand-select-chevron {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.measurand-filter-box:hover .measurand-select-chevron {
+  color: var(--cyan-laser);
+}
+
+.measurand-filter-box.has-active-filter .measurand-select-chevron {
+  color: var(--cyan-laser);
+}
+
+.btn-clear-measurand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.btn-clear-measurand:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+  transform: scale(1.08);
 }
 
 /* ============================================================ */
@@ -3113,27 +3216,24 @@ body.modal-open {
     gap: 10px;
   }
 
-  .filter-chips {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    gap: 8px;
-    padding: 2px 2px 6px;
+  .measurand-filter-box {
     width: 100%;
-  }
-
-  .filter-chips::-webkit-scrollbar {
-    display: none;
-  }
-
-  .chip {
-    white-space: nowrap;
-    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
     padding: 8px 14px;
-    font-size: 12px;
-    border-radius: 20px;
+    border-radius: 12px;
+    box-sizing: border-box;
+  }
+
+  .measurand-select-wrapper {
+    flex: 1;
+    display: flex;
+  }
+
+  .measurand-select {
+    width: 100%;
+    font-size: 13px;
+    padding: 6px 28px 6px 8px;
   }
 
   #btnNewInstrument {
