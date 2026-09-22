@@ -889,31 +889,6 @@ function stopVoiceRecording() {
   if (banner) banner.style.display = 'none';
 }
 
-function insertPopSnippet(type) {
-  const proc = document.getElementById('inputProcedureText');
-  if (!proc) return;
-
-  let snippet = '';
-  if (type === 'aclimatacao') {
-    snippet = '\n1. Aclimatação e Estabilização Térmica: Manter o instrumento e os padrões de teste na bancada a 20 ± 2 °C (ou 23 ± 5 °C) com UR entre 30% e 70% por no mínimo 2 horas antes de iniciar o ensaio.\n';
-  } else if (type === 'padrao') {
-    snippet = '\n2. Padrão de Trabalho Recomendado: Utilizar padrão com rastreabilidade RBC/INMETRO e relação de incerteza TUR ≥ 4:1 em relação à tolerância requerida pelo instrumento.\n';
-  } else if (type === 'ciclos') {
-    snippet = '\n3. Sequência de Ensaio: Iniciar em zero, aplicar os pontos de teste nominais em ciclo ascendente (0, 25, 50, 75, 100% da escala), aguardar estabilização e repetir no ciclo descendente.\n';
-  } else if (type === 'tolerancia') {
-    snippet = '\n4. Critérios de Aceitação: Calcular o erro em cada ponto (Erro = Indicação - Padrão). O equipamento é aprovado se o erro estiver dentro do Erro Máximo Permissível (EMP) do fabricante.\n';
-  }
-
-  const curPos = proc.selectionStart || proc.value.length;
-  const before = proc.value.substring(0, curPos);
-  const after = proc.value.substring(curPos);
-  proc.value = (before + snippet + after).trim();
-  proc.focus();
-  proc.classList.remove('is-invalid');
-  const err = document.getElementById('inputProcedureTextError');
-  if (err) err.classList.remove('active');
-}
-
 async function refineProcedureTextWithAi() {
   const procInput = document.getElementById('inputProcedureText');
   const draftText = procInput.value.trim();

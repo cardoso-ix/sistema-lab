@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=3.0">
+  <link rel="stylesheet" href="/style.css?v=3.1">
 </head>
 <body class="lab-body">
 
@@ -578,15 +578,6 @@
           <!-- Alerta de status do aprimoramento da IA -->
           <div id="aiRefineStatus" class="alert alert-info" style="display: none; margin-bottom: 12px;"></div>
 
-          <!-- Barra de Snippets Rápidos ISO/IEC 17025 -->
-          <div class="procedure-quick-snippets">
-            <span class="snippets-label">Blocos Rápidos:</span>
-            <button type="button" class="btn-snippet" onclick="insertPopSnippet('aclimatacao')">+ Aclimatação</button>
-            <button type="button" class="btn-snippet" onclick="insertPopSnippet('padrao')">+ Padrão</button>
-            <button type="button" class="btn-snippet" onclick="insertPopSnippet('ciclos')">+ Ciclos</button>
-            <button type="button" class="btn-snippet" onclick="insertPopSnippet('tolerancia')">+ Tolerância</button>
-          </div>
-
           <textarea id="inputProcedureText" rows="12" class="code-editor-textarea procedure-large-textarea" placeholder="Descreva os passos da calibração (ou clique em 'Falar por Áudio' para ditar pelo microfone):&#10;Ex: 'Foi feita a aclimatação por 2 horas a 23°C. Utilizamos o calibrador Fluke 5522A. Aplicamos tensão DC de 0 a 1000V nos bornes V/COM...'&#10;&#10;Depois clique em '✨ Melhorar com IA' para que o DeepSeek v4.1 estruture o POP formal da ISO/IEC 17025." required></textarea>
           <span class="field-error" id="inputProcedureTextError"></span>
         </div>
@@ -803,6 +794,6 @@
     </div>
   </div>
 
-  <script src="/app.js?v=3.0"></script>
+  <script src="/app.js?v=3.1"></script>
 </body>
 </html>

@@ -2148,23 +2148,7 @@ textarea:focus {
   flex-wrap: wrap;
 }
 
-.btn-snippet {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #94a3b8;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 5px 9px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
 
-.btn-snippet:hover {
-  background: rgba(0, 240, 255, 0.15);
-  border-color: var(--cyan-laser);
-  color: var(--cyan-laser);
-}
 
 .field-hint-badge {
   font-size: 10px;
@@ -2314,21 +2298,7 @@ textarea:focus {
   line-height: 1.4;
 }
 
-/* Barra de Snippets Rápidos */
-.procedure-quick-snippets {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
-}
 
-.snippets-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-dim);
-  font-family: var(--font-mono);
-}
 
 /* ============================================================ */
 /* CAPTURA DE FOTO NA HORA (CÂMERA DO CELULAR & VISOR AO VIVO)  */
@@ -3291,27 +3261,7 @@ body.modal-open {
     padding: 0 12px !important;
   }
 
-  .procedure-quick-snippets {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    gap: 6px;
-    padding-bottom: 4px;
-    margin-bottom: 8px;
-  }
 
-  .procedure-quick-snippets::-webkit-scrollbar {
-    display: none;
-  }
-
-  .btn-snippet {
-    white-space: nowrap;
-    flex-shrink: 0;
-    padding: 7px 12px;
-    font-size: 11.5px;
-  }
 
   .procedure-large-textarea {
     min-height: 190px !important;
