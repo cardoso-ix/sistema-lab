@@ -12,18 +12,28 @@ let dbInstance = null;
  */
 function initDatabase(dbPath = null) {
   if (!dbPath) {
-    const dataDir = path.join(__dirname, '..', 'data');
-    if (!fs.existsSync(dataDir)) {
-      fs.mkdirSync(dataDir, { recursive: true });
+    if (process.env.VERCEL) {
+      const tmpDir = path.join('/tmp', 'data');
+      if (!fs.existsSync(tmpDir)) {
+        fs.mkdirSync(tmpDir, { recursive: true });
+      }
+      dbPath = path.join(tmpDir, 'calibhub.db');
+    } else {
+      const dataDir = path.join(__dirname, '..', 'data');
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+      dbPath = path.join(dataDir, 'calibhub.db');
     }
-    dbPath = path.join(dataDir, 'calibhub.db');
   }
 
   dbInstance = new DatabaseSync(dbPath);
 
-  // Ativa modo WAL e integridade de chaves estrangeiras se não for em memória
-  if (dbPath !== ':memory:') {
+  // Ativa modo WAL em ambiente local ou MEMORY em serverless/memória
+  if (dbPath !== ':memory:' && !process.env.VERCEL) {
     dbInstance.exec('PRAGMA journal_mode = WAL;');
+  } else {
+    dbInstance.exec('PRAGMA journal_mode = MEMORY;');
   }
   dbInstance.exec('PRAGMA foreign_keys = ON;');
 

@@ -35,13 +35,32 @@ initDatabase();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Garante que as pastas de upload existem
-const uploadsDir = path.join(__dirname, '..', 'uploads');
-const photosDir = path.join(uploadsDir, 'photos');
-const docsDir = path.join(uploadsDir, 'docs');
+// Garante que as pastas de upload existem (com suporte a Vercel serverless)
+const isVercel = !!process.env.VERCEL;
+const baseUploadsDir = isVercel ? path.join('/tmp', 'uploads') : path.join(__dirname, '..', 'uploads');
+const photosDir = path.join(baseUploadsDir, 'photos');
+const docsDir = path.join(baseUploadsDir, 'docs');
 [photosDir, docsDir].forEach(d => {
   if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
 });
+
+// Se for Vercel, copia as fotos e docs padrão de demonstração para /tmp
+if (isVercel) {
+  const seedUploads = path.join(__dirname, '..', 'uploads');
+  ['photos', 'docs'].forEach(sub => {
+    const srcSub = path.join(seedUploads, sub);
+    const dstSub = path.join(baseUploadsDir, sub);
+    if (fs.existsSync(srcSub)) {
+      fs.readdirSync(srcSub).forEach(f => {
+        const srcFile = path.join(srcSub, f);
+        const dstFile = path.join(dstSub, f);
+        if (!fs.existsSync(dstFile)) {
+          fs.copyFileSync(srcFile, dstFile);
+        }
+      });
+    }
+  });
+}
 
 // Configuração do Multer com armazenamento seguro
 const storage = multer.diskStorage({
