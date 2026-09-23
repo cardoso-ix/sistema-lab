@@ -91,9 +91,61 @@ const upload = multer({
   }
 });
 
+// ============================================================
+// PADRÃO DE SEGURANÇA OWASP & METROLOGIA (ISO/IEC 17025)
+// ============================================================
+app.disable('x-powered-by');
+
+// Rate limiting simples em memória para mitigar força bruta no login
+const loginAttempts = new Map();
+const MAX_LOGIN_ATTEMPTS = 10;
+const LOGIN_LOCKOUT_MS = 5 * 60 * 1000;
+
+function rateLimitLogin(req, res, next) {
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+  const record = loginAttempts.get(ip);
+
+  if (record && record.lockedUntil) {
+    if (now < record.lockedUntil) {
+      const remainingSeconds = Math.ceil((record.lockedUntil - now) / 1000);
+      return res.status(429).json({
+        error: `Muitas tentativas de autenticação. Aguarde ${remainingSeconds}s antes de tentar novamente.`
+      });
+    }
+    loginAttempts.delete(ip);
+  }
+  next();
+}
+
+function recordFailedLogin(ip) {
+  const now = Date.now();
+  const record = loginAttempts.get(ip) || { count: 0, firstAttempt: now };
+  record.count += 1;
+  if (record.count >= MAX_LOGIN_ATTEMPTS) {
+    record.lockedUntil = now + LOGIN_LOCKOUT_MS;
+  }
+  loginAttempts.set(ip, record);
+}
+
+function recordSuccessfulLogin(ip) {
+  loginAttempts.delete(ip);
+}
+
+// Cabeçalhos de Segurança Padrão
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(self), microphone=(self), geolocation=()');
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob:; connect-src 'self'");
+  next();
+});
+
 // Middlewares básicos
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 
 // Middleware de extração de Token de Autenticação
 app.use((req, res, next) => {
@@ -144,23 +196,29 @@ function requireAdmin(req, res, next) {
 // ROTAS DE AUTENTICAÇÃO
 // ----------------------------------------------------
 
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', rateLimitLogin, (req, res) => {
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
   const { username, password } = req.body;
 
   const validation = validateRequiredFields({ username, password }, ['username', 'password']);
   if (!validation.isValid) {
+    recordFailedLogin(ip);
     return res.status(400).json({ error: 'Usuário e senha são obrigatórios e não podem estar em branco.' });
   }
 
   const user = findUserByUsername(username);
   if (!user) {
+    recordFailedLogin(ip);
     return res.status(401).json({ error: 'Credenciais inválidas. Verifique usuário e senha.' });
   }
 
   const isMatch = verifyPassword(password, user.password_salt, user.password_hash);
   if (!isMatch) {
+    recordFailedLogin(ip);
     return res.status(401).json({ error: 'Credenciais inválidas. Verifique usuário e senha.' });
   }
+
+  recordSuccessfulLogin(ip);
 
   const token = generateToken({
     userId: user.id,
@@ -169,8 +227,8 @@ app.post('/api/auth/login', (req, res) => {
     role: user.role
   });
 
-  // Define cookie HttpOnly opcional para navegador
-  res.setHeader('Set-Cookie', `calibhub_token=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400`);
+  const isSecure = req.secure || req.headers['x-forwarded-proto'] === 'https';
+  res.setHeader('Set-Cookie', `calibhub_token=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400${isSecure ? '; Secure' : ''}`);
 
   return res.json({
     token,
@@ -192,7 +250,8 @@ app.get('/api/auth/me', requireAuth, (req, res) => {
 });
 
 app.post('/api/auth/logout', (req, res) => {
-  res.setHeader('Set-Cookie', 'calibhub_token=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0');
+  const isSecure = req.secure || req.headers['x-forwarded-proto'] === 'https';
+  res.setHeader('Set-Cookie', `calibhub_token=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0${isSecure ? '; Secure' : ''}`);
   res.json({ message: 'Sessão encerrada com sucesso.' });
 });
 

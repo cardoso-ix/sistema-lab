@@ -15,7 +15,7 @@
     "procedimentos",
     "certificados"
   ],
-  "author": "Laboratório de Calibração",
+  "author": "Eduardo Cardoso",
   "license": "ISC",
   "dependencies": {
     "express": "^4.21.2",
