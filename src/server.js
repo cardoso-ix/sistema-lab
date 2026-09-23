@@ -193,6 +193,13 @@ function requireAdmin(req, res, next) {
 }
 
 // ----------------------------------------------------
+// HEALTH CHECK
+// ----------------------------------------------------
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', service: 'CalibHub Metrology Suite', version: '1.0.0', timestamp: new Date().toISOString() });
+});
+
+// ----------------------------------------------------
 // ROTAS DE AUTENTICAÇÃO
 // ----------------------------------------------------
 
