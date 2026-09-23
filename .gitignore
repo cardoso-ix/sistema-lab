@@ -19,3 +19,5 @@ Thumbs.db
 .env.local
 
 .vercel
+tools/
+
