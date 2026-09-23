@@ -1664,17 +1664,27 @@ function renderProcedureIntoDetail(procedureText) {
     }
 
     cleanTitle = cleanTitle.replace(/^[:\s-]+/, '').trim();
-    if (!cleanTitle) {
-      cleanTitle = stepMetaLookup[idx]?.defaultTitle || `Etapa ${stepNum}`;
+
+    // Determina o título e o corpo sem duplicação
+    let bodyText = contentLines;
+    if (!bodyText) {
+      // Se o passo veio em linha única (ex: "1. Posicionar a bobina..."):
+      // Usamos a instrução no corpo e um título de seção limpo no cabeçalho
+      if (cleanTitle.length > 25 || !titleLine.includes(':')) {
+        bodyText = cleanTitle;
+        cleanTitle = stepMetaLookup[idx]?.defaultTitle || `Instrução Operacional ${stepNum}`;
+      } else {
+        bodyText = cleanTitle;
+      }
     }
 
-    const formattedBody = formatStepContentHtml(contentLines || titleLine);
+    const formattedBody = formatStepContentHtml(bodyText);
 
     cardsHtml += `
       <div class="procedure-step-card" data-step="${stepNum}">
         <div class="step-card-header">
           <div class="step-card-meta">
-            <span class="step-num-badge">ETAPA ${stepNum}</span>
+            <span class="proc-step-badge">ETAPA ${stepNum}</span>
             <span class="step-icon-wrap" aria-hidden="true">${icon}</span>
             <h4 class="step-card-title">${escapeHtml(cleanTitle)}</h4>
           </div>

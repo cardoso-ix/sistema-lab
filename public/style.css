@@ -1820,16 +1820,26 @@ body.theme-light .auth-footer-credit strong {
   flex-wrap: wrap;
 }
 
-.step-num-badge {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background: rgba(14, 165, 233, 0.12);
-  color: #38bdf8;
-  border: 1px solid rgba(14, 165, 233, 0.25);
+.proc-step-badge,
+.procedure-step-card .step-num-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  width: auto !important;
+  min-width: unset !important;
+  height: auto !important;
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  padding: 3px 9px !important;
+  border-radius: 4px !important;
+  background: rgba(14, 165, 233, 0.12) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(14, 165, 233, 0.28) !important;
+  line-height: 1.2 !important;
+  flex-shrink: 0 !important;
 }
 
 .step-icon-wrap {
