@@ -86,11 +86,11 @@ function showAppView() {
   // Controle de visibilidade baseado em perfil (RBAC)
   const isAdmin = currentUser.role === 'admin';
   document.getElementById('btnAdminPanel').style.display = isAdmin ? 'inline-flex' : 'none';
-  document.getElementById('btnNewInstrument').style.display = isAdmin ? 'inline-flex' : 'none';
+  document.getElementById('btnNewInstrument').style.display = 'inline-flex';
   const mobileFab = document.getElementById('btnMobileFab');
-  if (mobileFab) mobileFab.style.display = isAdmin ? 'inline-flex' : 'none';
+  if (mobileFab) mobileFab.style.display = 'inline-flex';
   const tecBadge = document.getElementById('tecnicoNoticeBadge');
-  if (tecBadge) tecBadge.style.display = isAdmin ? 'none' : 'inline-flex';
+  if (tecBadge) tecBadge.style.display = 'none';
 }
 
 function prefillLogin(u, p) {
@@ -336,15 +336,20 @@ async function openDetailModal(id) {
     document.getElementById('detailRange').textContent = item.range;
     document.getElementById('detailCreatedBy').textContent = item.created_by || 'Sistema';
     document.getElementById('detailTypicalPoints').textContent = item.typical_points;
-    document.getElementById('detailProcedureText').textContent = item.procedure_text;
+    renderProcedureIntoDetail(item.procedure_text);
 
     const photoImg = document.getElementById('detailPhoto');
     photoImg.src = `/uploads/photos/${item.photo_filename}`;
     photoImg.alt = `${item.manufacturer} ${item.model}`;
 
-    // Ações de ADM na ficha
+    // Ações na ficha (Técnicos e Administradores podem editar; exclusão restrita ao ADM)
     const isAdmin = currentUser && currentUser.role === 'admin';
-    document.getElementById('adminDetailActions').style.display = isAdmin ? 'flex' : 'none';
+    const detailActions = document.getElementById('adminDetailActions');
+    if (detailActions) detailActions.style.display = 'flex';
+    const editBtn = document.getElementById('btnEditInstrument');
+    if (editBtn) editBtn.style.display = 'inline-flex';
+    const deleteBtn = document.getElementById('btnDeleteInstrument');
+    if (deleteBtn) deleteBtn.style.display = isAdmin ? 'inline-flex' : 'none';
 
     // Configuração dos Documentos
     setupDocTabView(item);
@@ -552,7 +557,12 @@ async function handlePhotoFileSelected(file) {
   try {
     const compressedBlob = await compressImage(file, 1920, 0.85);
     const fileName = `instrument_${Date.now()}.jpg`;
-    currentCapturedPhotoFile = new File([compressedBlob], fileName, { type: 'image/jpeg' });
+    try {
+      currentCapturedPhotoFile = new File([compressedBlob], fileName, { type: 'image/jpeg' });
+    } catch (e) {
+      compressedBlob.name = fileName;
+      currentCapturedPhotoFile = compressedBlob;
+    }
 
     const previewContainer = document.getElementById('photoPreviewContainer');
     const previewImg = document.getElementById('photoPreviewImg');
@@ -1220,7 +1230,12 @@ async function handleInstrumentSubmit(e) {
   // TRAVA 2: Foto do aparelho
   const photoInput = document.getElementById('inputPhoto');
   const usingDefaultPhoto = document.getElementById('usingDefaultPhoto')?.value === 'true';
-  const hasPhotoFile = (photoInput.files && photoInput.files.length > 0) || !!currentCapturedPhotoFile;
+  const galInput = document.getElementById('inputPhotoGallery');
+  const camInput = document.getElementById('inputPhotoCamera');
+  const hasPhotoFile = (photoInput.files && photoInput.files.length > 0) ||
+                       (galInput?.files && galInput.files.length > 0) ||
+                       (camInput?.files && camInput.files.length > 0) ||
+                       !!currentCapturedPhotoFile;
 
   if (!isEdit && !hasPhotoFile && !usingDefaultPhoto) {
     // Se o usuário não enviou arquivo de foto nem capturou, ativa foto padrão de bancada automaticamente
@@ -1249,9 +1264,14 @@ async function handleInstrumentSubmit(e) {
   formData.append('procedure_text', document.getElementById('inputProcedureText').value.trim());
 
   if (currentCapturedPhotoFile) {
-    formData.append('photo', currentCapturedPhotoFile);
+    const photoName = currentCapturedPhotoFile.name || `photo_${Date.now()}.jpg`;
+    formData.append('photo', currentCapturedPhotoFile, photoName);
   } else if (photoInput.files && photoInput.files[0]) {
     formData.append('photo', photoInput.files[0]);
+  } else if (galInput && galInput.files && galInput.files[0]) {
+    formData.append('photo', galInput.files[0]);
+  } else if (camInput && camInput.files && camInput.files[0]) {
+    formData.append('photo', camInput.files[0]);
   } else if (document.getElementById('usingDefaultPhoto')?.value === 'true') {
     formData.append('use_default_photo', 'true');
   }
@@ -1573,4 +1593,179 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+// ============================================================
+// RENDERIZADOR METROLÓGICO DE ROTEIRO POP (ISO/IEC 17025)
+// ============================================================
+
+function renderProcedureIntoDetail(procedureText) {
+  const container = document.getElementById('detailProcedureText');
+  if (!container) return;
+
+  if (!procedureText || !procedureText.trim()) {
+    container.innerHTML = '<div style="color: var(--text-muted); font-style: italic; padding: 12px;">Nenhum roteiro operacional cadastrado.</div>';
+    return;
+  }
+
+  const raw = procedureText.trim();
+  let sections = [];
+
+  if (raw.includes('### ETAPA') || raw.includes('ETAPA ')) {
+    const parts = raw.split(/(?=###?\s*ETAPA\s*\d+|ETAPA\s*\d+:?)/gi);
+    sections = parts.map(p => p.trim()).filter(Boolean);
+  } else if (/\n\s*[1-5]\.\s+/g.test(raw)) {
+    const parts = raw.split(/(?=\n\s*[1-5]\.\s+)/g);
+    sections = parts.map(p => p.trim()).filter(Boolean);
+  } else {
+    sections = raw.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
+  }
+
+  const stepMetaLookup = [
+    { titleMatch: /aclimat|ambient|temperatura/i, icon: '🌡️', stepNum: '01', defaultTitle: 'Aclimatação & Condições Ambientais' },
+    { titleMatch: /inspe|visual|seguran|bateria/i, icon: '🔍', stepNum: '02', defaultTitle: 'Inspeção Inicial & Conexões de Segurança' },
+    { titleMatch: /padr|rastreab|rbc|refer[eê]ncia/i, icon: '📐', stepNum: '03', defaultTitle: 'Padrões de Referência & Rastreabilidade RBC' },
+    { titleMatch: /ensaio|sequ[eê]ncia|execu|aplica|passo/i, icon: '⚖️', stepNum: '04', defaultTitle: 'Execução do Ensaio Passo a Passo' },
+    { titleMatch: /crit[eé]rio|aceita|tolera|incerteza|erro/i, icon: '📊', stepNum: '05', defaultTitle: 'Critérios de Aceitação & Incerteza de Medição' }
+  ];
+
+  let cardsHtml = '';
+
+  sections.forEach((sec, idx) => {
+    const lines = sec.split('\n');
+    let titleLine = lines[0].replace(/^###?\s*/, '').trim();
+    const contentLines = lines.slice(1).join('\n').trim();
+
+    let stepNum = String(idx + 1).padStart(2, '0');
+    let icon = '📋';
+    let cleanTitle = titleLine;
+
+    const etapaMatch = titleLine.match(/ETAPA\s*(\d+)[:\s-]*(.*)/i);
+    if (etapaMatch) {
+      stepNum = String(etapaMatch[1]).padStart(2, '0');
+      cleanTitle = etapaMatch[2].trim();
+    } else {
+      const numMatch = titleLine.match(/^(\d+)\.\s*(.*)/);
+      if (numMatch) {
+        stepNum = String(numMatch[1]).padStart(2, '0');
+        cleanTitle = numMatch[2].trim();
+      }
+    }
+
+    const emojiMatch = cleanTitle.match(/([\p{Emoji_Presentation}\p{Extended_Pictographic}])/u);
+    if (emojiMatch) {
+      icon = emojiMatch[1];
+      cleanTitle = cleanTitle.replace(emojiMatch[1], '').trim();
+    } else {
+      const foundMeta = stepMetaLookup.find(m => m.titleMatch.test(titleLine) || m.titleMatch.test(contentLines));
+      if (foundMeta) {
+        icon = foundMeta.icon;
+      }
+    }
+
+    cleanTitle = cleanTitle.replace(/^[:\s-]+/, '').trim();
+    if (!cleanTitle) {
+      cleanTitle = stepMetaLookup[idx]?.defaultTitle || `Etapa ${stepNum}`;
+    }
+
+    const formattedBody = formatStepContentHtml(contentLines || titleLine);
+
+    cardsHtml += `
+      <div class="procedure-step-card" data-step="${stepNum}">
+        <div class="step-card-header">
+          <div class="step-card-meta">
+            <span class="step-num-badge">ETAPA ${stepNum}</span>
+            <span class="step-icon-wrap" aria-hidden="true">${icon}</span>
+            <h4 class="step-card-title">${escapeHtml(cleanTitle)}</h4>
+          </div>
+          <span class="step-iso-tag">ISO/IEC 17025</span>
+        </div>
+        <div class="step-card-body">
+          ${formattedBody}
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = `
+    <div class="procedure-container-pro">
+      <div class="procedure-pro-toolbar">
+        <div class="procedure-toolbar-info">
+          <span class="procedure-live-dot"></span>
+          <span class="procedure-standard-tag">ABNT NBR ISO/IEC 17025</span>
+          <span class="procedure-doc-name">Instrução de Trabalho de Bancada (POP)</span>
+        </div>
+        <div class="procedure-toolbar-actions">
+          <button type="button" class="btn-copy-procedure" onclick="copyCurrentProcedureText()" title="Copiar roteiro completo para a área de transferência">
+            <span id="copyProcIcon">📋</span>
+            <span id="copyProcText">Copiar Roteiro</span>
+          </button>
+        </div>
+      </div>
+      <div class="procedure-steps-list">
+        ${cardsHtml}
+      </div>
+    </div>
+  `;
+}
+
+function formatStepContentHtml(rawContent) {
+  if (!rawContent) return '';
+  const lines = rawContent.split('\n').map(l => l.trim()).filter(Boolean);
+
+  let html = '';
+  let inList = false;
+
+  lines.forEach(line => {
+    const isBullet = /^[-*•]\s+|^[a-z]\)\s+/i.test(line);
+    const cleanText = line.replace(/^[-*•]\s+|^[a-z]\)\s+/i, '');
+    const highlighted = highlightMetrologyTerms(escapeHtml(cleanText));
+
+    if (isBullet) {
+      if (!inList) {
+        html += '<ul class="step-bullet-list">';
+        inList = true;
+      }
+      html += `<li class="step-bullet-item"><span class="bullet-marker">›</span><span class="bullet-text">${highlighted}</span></li>`;
+    } else {
+      if (inList) {
+        html += '</ul>';
+        inList = false;
+      }
+      html += `<p class="step-paragraph">${highlighted}</p>`;
+    }
+  });
+
+  if (inList) {
+    html += '</ul>';
+  }
+
+  return html;
+}
+
+function highlightMetrologyTerms(safeText) {
+  return safeText
+    .replace(/(\b\d+(?:[.,]\d+)?\s*(?:°C|%|UR|bar|psi|V|mV|A|mA|Ω|kΩ|MΩ|mm|g|kg|N|Hz|kHz|minutos?|horas?|s)\b)/gi, '<strong class="metric-val">$1</strong>')
+    .replace(/(TUR\s*≥\s*\d+:\d+|TUR\s*&gt;=\s*\d+:\d+)/gi, '<span class="metric-badge">$1</span>')
+    .replace(/(Erro\s*=\s*[^.<]+)/gi, '<code class="metric-formula">$1</code>');
+}
+
+function copyCurrentProcedureText() {
+  if (!activeInstrument || !activeInstrument.procedure_text) return;
+  navigator.clipboard.writeText(activeInstrument.procedure_text).then(() => {
+    const btn = document.querySelector('.btn-copy-procedure');
+    const icon = document.getElementById('copyProcIcon');
+    const txt = document.getElementById('copyProcText');
+    if (txt) txt.textContent = 'Copiado! ✓';
+    if (icon) icon.textContent = '✓';
+    if (btn) btn.classList.add('copied');
+
+    setTimeout(() => {
+      if (txt) txt.textContent = 'Copiar Roteiro';
+      if (icon) icon.textContent = '📋';
+      if (btn) btn.classList.remove('copied');
+    }, 2500);
+  }).catch(() => {
+    alert('Texto do procedimento: \n\n' + activeInstrument.procedure_text);
+  });
 }

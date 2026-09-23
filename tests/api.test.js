@@ -79,14 +79,36 @@ describe('Testes de Integração da API & Segurança (HTTP)', () => {
     assert.ok(data.instruments.length >= 1, 'Deve conter os instrumentos do seed');
   });
 
-  test('POST /api/instruments com token de Técnico deve retornar 403 Forbidden (RBAC)', async () => {
+  test('POST /api/instruments com token de Técnico deve permitir cadastro de bancada (HTTP 201)', async () => {
     const res = await fetch(`${baseUrl}/api/instruments`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${tecnicoToken}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ name: 'Tentativa de Criar' })
+      body: JSON.stringify({
+        tag: 'CAL-TEC-001',
+        name: 'Multímetro Teste Técnico',
+        manufacturer: 'Fluke',
+        model: '179',
+        range: '0 a 1000V',
+        measurand: 'Elétrica',
+        typical_points: '10V, 100V, 750V',
+        procedure_text: '### ETAPA 1: 🌡️ Aclimatação\nEstabilizar por 2 horas.',
+        use_default_photo: 'true'
+      })
+    });
+
+    assert.equal(res.status, 201);
+    const data = await res.json();
+    assert.ok(data.instrument);
+    assert.equal(data.instrument.tag, 'CAL-TEC-001');
+  });
+
+  test('DELETE /api/instruments/:id com token de Técnico deve retornar 403 Forbidden (Exclusivo ADM)', async () => {
+    const res = await fetch(`${baseUrl}/api/instruments/1`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${tecnicoToken}` }
     });
 
     assert.equal(res.status, 403);

@@ -72,13 +72,13 @@ const storage = multer.diskStorage({
     }
   },
   filename: (req, file, cb) => {
-    cb(null, generateSecureFileName(file.originalname));
+    cb(null, generateSecureFileName(file.originalname, file.mimetype));
   }
 });
 
 const fileFilter = (req, file, cb) => {
-  if (!isAllowedFileExtension(file.originalname)) {
-    return cb(new Error('Tipo de arquivo não permitido. Apenas .jpg, .jpeg, .png, .webp e .pdf são aceitos.'), false);
+  if (!isAllowedFileExtension(file.originalname, file.mimetype)) {
+    return cb(new Error('Tipo de arquivo não permitido. Aceitos: Imagens (.jpg, .jpeg, .png, .webp, .jfif, .heic) e Documentos (.pdf, .doc, .docx).'), false);
   }
   cb(null, true);
 };
@@ -305,7 +305,7 @@ app.get('/api/instruments/:id', requireAuth, (req, res) => {
   res.json({ instrument });
 });
 
-// Cadastro de novo instrumento (Exclusivo ADM com trava contra campos em branco)
+// Cadastro de novo instrumento (Técnicos e Administradores com trava contra campos em branco)
 const uploadFields = upload.fields([
   { name: 'photo', maxCount: 1 },
   { name: 'certificate', maxCount: 1 },
@@ -313,7 +313,7 @@ const uploadFields = upload.fields([
   { name: 'procedure', maxCount: 1 }
 ]);
 
-app.post('/api/instruments', requireAdmin, uploadFields, (req, res) => {
+app.post('/api/instruments', requireAuth, uploadFields, (req, res) => {
   try {
     const {
       tag,
@@ -379,8 +379,8 @@ app.post('/api/instruments', requireAdmin, uploadFields, (req, res) => {
   }
 });
 
-// Atualização de instrumento (Exclusivo ADM)
-app.put('/api/instruments/:id', requireAdmin, uploadFields, (req, res) => {
+// Atualização de instrumento (Técnicos e Administradores)
+app.put('/api/instruments/:id', requireAuth, uploadFields, (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) return res.status(400).json({ error: 'ID inválido.' });

@@ -7,7 +7,8 @@ const {
   verifyToken,
   validateRequiredFields,
   sanitizeFileName,
-  isAllowedFileExtension
+  isAllowedFileExtension,
+  generateSecureFileName
 } = require('../src/security.js');
 
 describe('Módulo de Segurança e Validação Estrita', () => {
@@ -114,12 +115,29 @@ describe('Módulo de Segurança e Validação Estrita', () => {
       assert.equal(isAllowedFileExtension('manual.PDF'), true);
       assert.equal(isAllowedFileExtension('foto.png'), true);
       assert.equal(isAllowedFileExtension('foto.webp'), true);
+      assert.equal(isAllowedFileExtension('foto_camera.jfif'), true);
+      assert.equal(isAllowedFileExtension('iphone_img.HEIC'), true);
+      assert.equal(isAllowedFileExtension('procedimento.docx'), true);
+      assert.equal(isAllowedFileExtension('blob', 'image/jpeg'), true);
+      assert.equal(isAllowedFileExtension('blob', 'image/png'), true);
 
       // Rejeitar extensões inseguras
       assert.equal(isAllowedFileExtension('script.exe'), false);
       assert.equal(isAllowedFileExtension('malware.sh'), false);
       assert.equal(isAllowedFileExtension('shell.php'), false);
       assert.equal(isAllowedFileExtension('semextensao'), false);
+      assert.equal(isAllowedFileExtension('script.exe', 'image/jpeg'), false);
+    });
+
+    test('deve gerar nome de arquivo seguro derivando extensão de mimetype quando necessário', () => {
+      const nameFromJpg = generateSecureFileName('foto.jpg');
+      assert.ok(nameFromJpg.endsWith('.jpg'));
+
+      const nameFromBlob = generateSecureFileName('blob', 'image/png');
+      assert.ok(nameFromBlob.endsWith('.png'));
+
+      const nameFromDefault = generateSecureFileName('semextensao');
+      assert.ok(nameFromDefault.endsWith('.jpg'));
     });
 
     test('deve sanitizar nomes e neutralizar tentativas de Directory Traversal', () => {

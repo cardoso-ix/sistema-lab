@@ -132,16 +132,46 @@ function validateRequiredFields(data, requiredFields = []) {
   };
 }
 
+const ALLOWED_EXTENSIONS = [
+  '.jpg', '.jpeg', '.png', '.webp', '.jfif', '.heic', '.heif', '.bmp', '.tiff', '.svg',
+  '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.txt', '.csv'
+];
+
+const DANGEROUS_EXTENSIONS = [
+  '.exe', '.sh', '.php', '.bat', '.cmd', '.js', '.py', '.vbs', '.msi', '.com', '.scr', '.ps1'
+];
+
 /**
- * Verifica se a extensão do arquivo é estritamente permitida para foto ou documento
+ * Verifica se a extensão ou mimetype do arquivo é permitido para fotos de bancada ou documentos anexos
  * @param {string} filename
+ * @param {string} [mimetype]
  * @returns {boolean}
  */
-function isAllowedFileExtension(filename) {
+function isAllowedFileExtension(filename, mimetype = '') {
   if (!filename || typeof filename !== 'string') return false;
-  const ext = path.extname(filename).toLowerCase();
-  const allowed = ['.jpg', '.jpeg', '.png', '.webp', '.pdf'];
-  return allowed.includes(ext);
+
+  const base = path.basename(filename).toLowerCase().trim();
+  const ext = path.extname(base).toLowerCase();
+
+  // Bloqueio rigoroso de scripts e executáveis
+  if (DANGEROUS_EXTENSIONS.includes(ext)) {
+    return false;
+  }
+
+  // Se tem extensão válida cadastrada
+  if (ext && ALLOWED_EXTENSIONS.includes(ext)) {
+    return true;
+  }
+
+  // Tratamento especial para uploads de câmera/canvas sem extensão (ex: 'blob' ou 'image')
+  if ((!ext || base === 'blob' || base.startsWith('blob.')) && mimetype) {
+    const mime = mimetype.toLowerCase().trim();
+    if (mime.startsWith('image/') || mime === 'application/pdf' || mime.includes('document') || mime.includes('sheet')) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /**
@@ -160,12 +190,28 @@ function sanitizeFileName(filename) {
 }
 
 /**
- * Gera um nome seguro e único com UUID preservando a extensão válida
+ * Gera um nome seguro e único com UUID preservando ou inferindo a extensão válida
  * @param {string} originalName
+ * @param {string} [mimetype]
  * @returns {string}
  */
-function generateSecureFileName(originalName) {
-  const ext = path.extname(originalName).toLowerCase();
+function generateSecureFileName(originalName, mimetype = '') {
+  let ext = path.extname(originalName || '').toLowerCase().trim();
+
+  // Se não tem extensão ou veio como 'blob' da câmera/canvas
+  if (!ext || originalName === 'blob') {
+    if (mimetype) {
+      const mime = mimetype.toLowerCase();
+      if (mime.includes('png')) ext = '.png';
+      else if (mime.includes('webp')) ext = '.webp';
+      else if (mime.includes('pdf')) ext = '.pdf';
+      else if (mime.includes('heic')) ext = '.heic';
+      else ext = '.jpg';
+    } else {
+      ext = '.jpg';
+    }
+  }
+
   const uuid = crypto.randomUUID();
   return `${uuid}${ext}`;
 }

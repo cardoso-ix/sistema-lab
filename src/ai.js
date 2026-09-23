@@ -39,7 +39,7 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem blocos markdown adicionais ou t
   "measurand": "Escolha exatamente uma opção dentre estas: Elétrica, Pressão, Temperatura, Dimensional, Massa, Força e Torque, Vazão e Volume, Tempo e Frequência, Umidade, Acústica e Vibração, Óptica e Radiação, Físico-Química, Gás e Detecção, Outras",
   "range": "Faixas de medição nominais detalhadas e resolução de fábrica para o modelo ${model.trim()}",
   "typical_points": "Pontos nominais recomendados para a malha de calibração na bancada (especificar valores de teste numéricos reais para as escalas principais)",
-  "procedure_text": "Roteiro Operacional Padrão (POP) passo a passo detalhado para o técnico executar na bancada:\\n1. Aclimatação e estabilização térmica (tempo e temperatura nominal)\\n2. Inspeção física, verificação de baterias/fusíveis e conexões corretas nos bornes/tomadas\\n3. Padrão de trabalho recomendado (ex: calibrador multifunção, balança de pressão, etc.)\\n4. Sequência de aplicação dos pontos ascendentes e descendentes com tempos de estabilização\\n5. Critérios de aceitação e tolerâncias recomendadas segundo especificações de fábrica"
+  "procedure_text": "Roteiro Operacional Padrão (POP) passo a passo estruturado estritamente nas 5 etapas da ISO/IEC 17025:\\n### ETAPA 1: 🌡️ Aclimatação & Condições Ambientais\\n- Temperatura e Umidade nominais de bancada (20 ± 2 °C / 23 ± 2 °C e UR 30% a 70%)\\n- Tempo mínimo de repouso térmico\\n\\n### ETAPA 2: 🔍 Inspeção Inicial & Conexões de Segurança\\n- Verificação visual, integridade física, bornes e baterias/fusíveis\\n\\n### ETAPA 3: 📐 Padrões de Referência & Rastreabilidade RBC\\n- Instrumento padrão recomendado rastreado RBC/Inmetro com TUR ≥ 4:1\\n\\n### ETAPA 4: ⚖️ Execução do Ensaio Passo a Passo\\n- Ciclos de medição nos pontos nominais (ascendente e descendente), tempo de estabilização\\n\\n### ETAPA 5: 📊 Critérios de Aceitação & Incerteza de Medição\\n- Fórmula do erro (Erro = Indicação - Padrão), limites de tolerância e aprovação"
 }`;
 
   const controller = new AbortController();
@@ -160,32 +160,108 @@ function generateEmergencyFallback(manufacturer, model) {
     name = `Manômetro de Pressão ${mfg} ${mdl}`;
     range = 'Faixa de 0 a 10 bar (ou conforme escala gravada no mostrador)';
     typical_points = '0, 2.5, 5.0, 7.5 e 10.0 bar (ciclos ascendente e descendente)';
-    procedure_text = `1. Aclimatação e Estabilização Térmica: Estabilizar o instrumento no laboratório a 20 ± 2 °C com UR entre 45% e 75% por no mínimo 2 horas.\n2. Inspeção Física: Verificar integridade do visor, ponteiro, rosca de conexão e ausência de vazamentos hidráulicos/pneumáticos.\n3. Padrão Recomendado: Balança de pressão (deadweight tester) ou calibrador de pressão digital com relação TUR ≥ 4:1.\n4. Sequência de Aplicação: Iniciar em zero, aplicar pressão nos pontos 0%, 25%, 50%, 75% e 100% do span, aguardar 30s para estabilização da leitura. Repetir o ciclo em ordem descendente (100%, 75%, 50%, 25%, 0%).\n5. Critérios de Aceitação: O erro em cada ponto e a histerese devem ser menores ou iguais ao Erro Máximo Permissível (EMP = Classe de exatidão × Span).`;
+    procedure_text = `### ETAPA 1: 🌡️ Aclimatação & Condições Ambientais
+- Estabilizar o instrumento no laboratório em temperatura controlada de 20 ± 2 °C com Umidade Relativa entre 45% e 75% por no mínimo 2 horas antes de iniciar o ensaio.
+
+### ETAPA 2: 🔍 Inspeção Inicial & Conexões de Segurança
+- Verificar integridade visual do mostrador, ponteiro indicador, rosca de fixação NPT/BSP e ausência total de vazamentos nas conexões pneumáticas/hidráulicas.
+- Realizar a purga e selagem de ar no circuito de calibração antes da primeira pressurização.
+
+### ETAPA 3: 📐 Padrões de Referência & Rastreabilidade RBC
+- Utilizar Balança de Pressão (Deadweight Tester) ou Calibrador Digital de Pressão de alta exatidão rastreado RBC/INMETRO, garantindo relação de capacidade de medição TUR ≥ 4:1.
+
+### ETAPA 4: ⚖️ Execução do Ensaio Passo a Passo
+- Ciclo Ascendente: Aplicar pressão progressivamente nos pontos nominais (0%, 25%, 50%, 75% e 100% do span). Aguardar 30 segundos de estabilização em cada ponto antes de congelar a leitura.
+- Ciclo Descendente: Reduzir a pressão de 100% para 0% nos mesmos pontos nominais, registrando o erro de histerese e verificando o retorno ao ponto zero.
+
+### ETAPA 5: 📊 Critérios de Aceitação & Incerteza de Medição
+- Calcular Erro de Indicação = Leitura do Instrumento - Pressão Padrão Aplicada.
+- Tolerância de Aprovação: O erro máximo e o erro de histerese devem ser menores ou iguais ao Erro Máximo Permissível (EMP = Classe de Exatidão × Span nominal).`;
   } else if (lower.includes('termomet') || lower.includes('temp') || lower.includes('pt100') || lower.includes('termopar') || lower.includes('novus') || lower.includes('testo')) {
     measurand = 'Temperatura';
     name = `Termômetro / Indicador de Temperatura ${mfg} ${mdl}`;
     range = '-50 °C a 400 °C (ou conforme especificação do sensor)';
     typical_points = '0 °C, 50 °C, 100 °C, 150 °C e 200 °C';
-    procedure_text = `1. Aclimatação: Manter o instrumento na temperatura padrão do laboratório (23 ± 2 °C) por 2 horas.\n2. Inspeção: Inspecionar cabos de compensação, bainha do sensor e conexões dos bornes.\n3. Padrão Recomendado: Bloco seco calibrador térmico ou banho termostático com termômetro padrão SPRT rastreável RBC.\n4. Sequência de Ensaio: Inserir o sensor na profundidade correta no bloco, aguardar estabilização do gradiente térmico por no mínimo 10 minutos por ponto e registrar as leituras nos ciclos ascendente e descendente.\n5. Tolerâncias: Desvio máximo permitido conforme especificação de fábrica ou classe ASTM/IEC do sensor.`;
+    procedure_text = `### ETAPA 1: 🌡️ Aclimatação & Condições Ambientais
+- Manter o instrumento e cabos de termopar/PT100 estabilizados na temperatura ambiente padrão (23 ± 2 °C, UR 30% a 70%) por 2 horas.
+
+### ETAPA 2: 🔍 Inspeção Inicial & Conexões de Segurança
+- Inspecionar isolamento dos cabos de compensação, bainha metálica do sensor, estado dos conectores tipo mini-TC/bornes e checar nível de carga da bateria.
+
+### ETAPA 3: 📐 Padrões de Referência & Rastreabilidade RBC
+- Bloco Seco Térmico ou Banho Termostático de alta estabilidade, equipado com Termômetro Padrão de Resistência de Platina (SPRT) com certificado RBC vigente.
+
+### ETAPA 4: ⚖️ Execução do Ensaio Passo a Passo
+- Inserir a haste do sensor no poço de equalização com profundidade de imersão adequada (mínimo 15 vezes o diâmetro da bainha para mitigar perdas por condução térmica).
+- Aplicar os pontos térmicos nominais programados, aguardar gradiente de estabilização por no mínimo 10 minutos por patamar e registrar as leituras nos ciclos ascendente e descendente.
+
+### ETAPA 5: 📊 Critérios de Aceitação & Incerteza de Medição
+- Determinar o desvio térmico (Erro = Leitura UUT - Temperatura Padrão RBC). O desvio não deve ultrapassar a tolerância da Classe A/B (IEC 60751) ou classe de exatidão do fabricante.`;
   } else if (lower.includes('paquimetr') || lower.includes('micrometr') || lower.includes('mitutoyo') || lower.includes('dimensional') || lower.includes('relogio')) {
     measurand = 'Dimensional';
     name = `Instrumento Dimensional de Precisão ${mfg} ${mdl}`;
     range = '0 a 150 mm (resolução 0.01 mm / 0.001 mm)';
     typical_points = '0 mm, 25 mm, 50 mm, 75 mm, 100 mm e 150 mm';
-    procedure_text = `1. Aclimatação: Manter o instrumento e os blocos-padrão a 20 ± 1 °C por no mínimo 4 horas para estabilização de dilatação térmica.\n2. Inspeção: Limpar as faces de medição com álcool isopropílico e papel especial, verificar paralelismo e zeramento.\n3. Padrão Recomendado: Jogo de Blocos-Padrão de Aço/Cerâmica Classe 1 ou Classe 0 rastreado RBC.\n4. Sequência de Ensaio: Medir os blocos em posição central das faces, aplicando força de medição constante com auxílio da catraca/fricção.\n5. Critérios de Aceitação: Erro de indicação e repetibilidade devem estar dentro das tolerâncias da norma ABNT NBR NM ISO 13385.`;
+    procedure_text = `### ETAPA 1: 🌡️ Aclimatação & Condições Ambientais
+- Aclimatar o instrumento e o jogo de blocos-padrão no laboratório mantido a 20 ± 1 °C por no mínimo 4 horas para anular variações por coeficiente de dilatação térmica linear.
+
+### ETAPA 2: 🔍 Inspeção Inicial & Conexões de Segurança
+- Desengraxar e higienizar as superfícies de medição com álcool isopropílico de pureza óptica e papel especial sem fiapos.
+- Verificar planicidade, paralelismo ótico das faces e zeramento sem folga no nônio/display.
+
+### ETAPA 3: 📐 Padrões de Referência & Rastreabilidade RBC
+- Jogo de Blocos-Padrão longitudinais de Aço/Cerâmica Classe 1 ou Classe 0 com certificado RBC/Inmetro atualizado.
+
+### ETAPA 4: ⚖️ Execução do Ensaio Passo a Passo
+- Posicionar os blocos na porção central das faces de medição.
+- Aplicar a força recomendada de medição constante acionando a catraca/fricção (5 a 10 N), registrando 3 medições consecutivas por ponto nominal.
+
+### ETAPA 5: 📊 Critérios de Aceitação & Incerteza de Medição
+- Calcular Erro de Indicação e Repetibilidade conforme limites da norma ABNT NBR NM ISO 13385. O erro deve estar estritamente dentro da faixa de tolerância máxima da norma.`;
   } else if (lower.includes('balanca') || lower.includes('peso') || lower.includes('massa') || lower.includes('toledo') || lower.includes('gehaka')) {
     measurand = 'Massa / Balança';
     name = `Balança de Precisão ${mfg} ${mdl}`;
     range = '0 a 2000 g (resolução 0.01 g / 0.1 g)';
     typical_points = '0 g, 200 g, 500 g, 1000 g, 1500 g e 2000 g';
-    procedure_text = `1. Aclimatação: Instalar a balança sobre mesa antivibratória, nivelar a bolha de nível e ligar com antecedência de 30 min.\n2. Inspeção: Limpar o prato de pesagem e verificar estabilidade da indicação de zero.\n3. Padrão Recomendado: Conjunto de pesos-padrão Classe F1 ou E2 rastreados RBC/INMETRO.\n4. Sequência de Ensaio: Realizar ensaio de exatidão de carga (ascendente/descendente), ensaio de excentricidade nos 4 quadrantes e ensaio de repetibilidade com 10 repetições.\n5. Tolerâncias: Erro máximo admissível conforme portaria do INMETRO para a classe da balança.`;
+    procedure_text = `### ETAPA 1: 🌡️ Aclimatação & Condições Ambientais
+- Instalar a balança sobre mesa antivibratória de granito em bancada livre de correntes de ar, mantendo 20 ± 2 °C e ligada (warm-up) por no mínimo 30 minutos.
+
+### ETAPA 2: 🔍 Inspeção Inicial & Conexões de Segurança
+- Ajustar rigorosamente o nível esférico (bolha de ar no centro do anel), higienizar o prato de pesagem com pincel macio antiestático e acionar a tara de zero.
+
+### ETAPA 3: 📐 Padrões de Referência & Rastreabilidade RBC
+- Conjunto de Pesos-Padrão Classe F1 ou E2 rastreados à RBC/INMETRO, manipulados exclusivamente com pinças revestidas e luvas antiestáticas de algodão.
+
+### ETAPA 4: ⚖️ Execução do Ensaio Passo a Passo
+- Ensaio de Carga: Aplicar cargas crescentes e decrescentes nos pontos nominais pré-determinados.
+- Ensaio de Excentricidade: Aplicar 1/3 da carga máxima no centro e nos 4 quadrantes periféricos do prato de pesagem.
+- Ensaio de Repetibilidade: Executar 10 pesagens sucessivas em 50% e 100% da carga máxima.
+
+### ETAPA 5: 📊 Critérios de Aceitação & Incerteza de Medição
+- Os erros de carga, excentricidade e repetibilidade devem atender aos critérios de Erro Máximo Permissível (EMP) da Portaria INMETRO 236/94 para a classe da balança.`;
   } else {
     // Padrão Elétrica (Fluke, Megabras, Minipa, etc.)
     measurand = 'Elétrica';
     name = `Multímetro / Calibrador Industrial ${mfg} ${mdl}`;
     range = 'Tensões DC/AC até 1000V, Correntes até 10A, Resistência até 50MΩ';
     typical_points = 'DCV: 100mV, 1V, 10V, 100V, 1000V; ACV: 1V, 10V, 100V, 750V; Res: 100Ω, 1kΩ, 10kΩ, 100kΩ, 1MΩ';
-    procedure_text = `1. Aclimatação e Estabilização Térmica: Estabilizar o equipamento na bancada a 23 ± 5 °C e UR < 70% por no mínimo 2 horas.\n2. Inspeção Física e Conexões: Verificar condição dos bornes, integridade de fusíveis e cabos com ponta de prova blindada.\n3. Padrão Recomendado: Calibrador multifunção Fluke 5500A/5522A ou padrão rastreável RBC/INMETRO com relação TUR ≥ 4:1.\n4. Sequência de Aplicação: Iniciar pela escala de zero, aplicar os pontos ascendentes conforme typical_points, aguardar 5 segundos para estabilização do conversor A/D e repetir no ciclo descendente.\n5. Critérios de Aceitação: Calcular Erro = Leitura - Valor Aplicado. Comparar com o Erro Máximo Permissível (EMP) especificado no manual do fabricante para 1 ano.`;
+    procedure_text = `### ETAPA 1: 🌡️ Aclimatação & Condições Ambientais
+- Estabilizar o equipamento na bancada a 23 ± 2 °C com Umidade Relativa entre 30% e 70% por no mínimo 2 horas para equilíbrio eletrotérmico dos semicondutores.
+
+### ETAPA 2: 🔍 Inspeção Inicial & Conexões de Segurança
+- Inspecionar visualmente bornes de entrada, integridade mecânica das pontas de prova, isolamento elétrico e testar fusíveis de alta capacidade de interrupção (HRC).
+
+### ETAPA 3: 📐 Padrões de Referência & Rastreabilidade RBC
+- Calibrador Multifunção (ex: Fluke 5500A / 5522A) com certificado de calibração RBC vigente, assegurando relação TUR ≥ 4:1 na escala sob ensaio.
+
+### ETAPA 4: ⚖️ Execução do Ensaio Passo a Passo
+- Iniciar na escala de Tensão DC conectando pontas de prova nos bornes V/Ω e COM.
+- Aplicar os pontos nominais em ciclo ascendente, aguardar 5 segundos de acomodação do conversor A/D por leitura, registrar o valor e repetir no ciclo descendente.
+- Proceder de forma análoga para Tensão AC (60 Hz e 1 kHz), Corrente DC/AC e Resistência (conexão a 4 fios para valores baixos).
+
+### ETAPA 5: 📊 Critérios de Aceitação & Incerteza de Medição
+- Calcular Erro de Indicação = Leitura UUT - Valor Injetado pelo Padrão.
+- Critério de Aprovação: O erro deve estar dentro do Erro Máximo Permissível (EMP = ±[% da leitura + dígitos]) especificado na folha de dados do fabricante.`;
   }
 
   return { name, measurand, range, typical_points, procedure_text };
@@ -288,16 +364,33 @@ Grandeza: ${measurand.trim() || 'Metrologia Geral'}
 
 Sua missão: REESCREVER e PADRONIZAR essa explicação em um Roteiro Operacional Padrão (POP) formal, rigoroso e de fácil leitura para o técnico na bancada, seguindo os requisitos da ISO/IEC 17025.
 
-Diretrizes obrigatórias:
-1. Mantenha fielmente todas as informações, pontos e métodos descritos pelo técnico, corrigindo a redação para vocabulário técnico formal de metrologia (ex: "calibrador padrão", "estabilização térmica", "relação TUR", "erro de indicação", "ciclos ascendente e descendente").
-2. Estruture o procedimento de forma numerada e clara nos seguintes tópicos:
-   1. Aclimatação e Estabilização Térmica
-   2. Inspeção Física e Conexões de Segurança
-   3. Padrão de Trabalho Recomendado e Rastreabilidade RBC
-   4. Sequência Operacional de Ensaio (Passo a Passo)
-   5. Critérios de Aceitação e Tolerâncias Aplicáveis
-3. HIGIENIZAÇÃO DE ÁUDIO / ANTI-REPETIÇÃO: O relato do técnico pode ter sido obtido por ditado de voz no microfone e conter ecos de transcrição, gaguejos ou palavras/frases repetidas várias vezes (ex: "aplicamos aplicamos 10V", "foi feita a calibração foi feita a calibração", "estabilizamos estabilizamos"). ELIMINE AUTOMATICAMENTE quaisquer repetições ou duplicações involuntárias, entregando um texto fluido, conciso e metrologicamente impecável.
-4. Retorne APENAS o texto pronto do procedimento, SEM blocos de código markdown (\`\`\`), SEM aspas envolvendo o texto e SEM mensagens de introdução ou conclusão.`;
+Diretrizes obrigatórias de formatação e estrutura:
+Organize o procedimento ESTRITAMENTE em 5 ETAPAS numeradas e com títulos destacados com emoji técnico e separadores claros:
+
+### ETAPA 1: 🌡️ Aclimatação & Condições Ambientais
+- Temperatura nominal do laboratório (ex: 20 ± 2 °C para dimensional/pressão ou 23 ± 2 °C para elétrica/temperatura) e Umidade Relativa (UR 30% a 70%).
+- Tempo mínimo de repouso térmico do instrumento e dos padrões antes de iniciar o ensaio.
+
+### ETAPA 2: 🔍 Inspeção Inicial & Conexões de Segurança
+- Inspeção visual de carcaça, visor, bornes, conexões, ponteiras e estado geral de conservação.
+- Checagem de bateria, fusíveis de proteção e aterramento elétrico.
+
+### ETAPA 3: 📐 Padrões de Referência & Rastreabilidade RBC
+- Especificação clara do equipamento padrão de trabalho (ex: Calibrador Multifunção, Balança de Pressão, Blocos-Padrão).
+- Exigência de certificado RBC vigente e relação de capacidade de medição TUR ≥ 4:1.
+
+### ETAPA 4: ⚖️ Execução do Ensaio Passo a Passo (Ciclos de Medição)
+- Detalhe em itens ordenados (a, b, c...) a aplicação dos pontos nominais descritos pelo técnico.
+- Especificação de ciclos ascendente e descendente (se aplicável), tempo de acomodação por ponto e registro metrológico.
+
+### ETAPA 5: 📊 Critérios de Aceitação & Incerteza de Medição
+- Regra de cálculo do erro de indicação (Erro = Indicação - Padrão).
+- Tolerância máxima permitida (EMP / especificação de catálogo) e regra de decisão para aprovação.
+
+HIGIENIZAÇÃO DE ÁUDIO / ANTI-REPETIÇÃO:
+O relato do técnico pode ter sido obtido por ditado de voz no microfone e conter ecos de transcrição, gaguejos ou palavras repetidas (ex: "estabilizamos estabilizamos" -> "estabilizamos"). ELIMINE AUTOMATICAMENTE quaisquer repetições ou duplicações involuntárias.
+
+Retorne APENAS o procedimento estruturado nas 5 etapas, sem blocos de código markdown adicionais (\`\`\`) e sem preâmbulos.`;
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 60000);
@@ -424,25 +517,28 @@ function deduplicateSpeechText(text) {
 
 /**
  * Fallback local caso a API esteja offline:
- * Estrutura o relato do técnico nos tópicos da ISO/IEC 17025 com higienização de voz.
+ * Estrutura o relato do técnico nos tópicos padronizados da ISO/IEC 17025 com higienização de voz.
  */
 function formatLocalProcedureFallback(draftText, manufacturer, model, measurand) {
   const cleanDraft = deduplicateSpeechText(draftText);
   const title = manufacturer && model ? `${manufacturer} ${model}` : 'Instrumento de Bancada';
-  return `1. Aclimatação e Estabilização Térmica:
-Manter o instrumento e os padrões de teste na bancada em ambiente controlado (20 ± 2 °C ou 23 ± 5 °C, UR 30% a 70%) por no mínimo 2 horas antes de iniciar os ensaios.
+  return `### ETAPA 1: 🌡️ Aclimatação & Condições Ambientais
+- Manter o instrumento ${title} e os padrões na bancada em ambiente climatizado (20 ± 2 °C ou 23 ± 2 °C, UR 30% a 70%) por no mínimo 2 horas para estabilização térmica e higrométrica antes do ensaio.
 
-2. Inspeção Física e Conexões de Segurança:
-Verificar a integridade visual geral de ${title}, terminais de conexão e ausência de avarias.
+### ETAPA 2: 🔍 Inspeção Inicial & Conexões de Segurança
+- Inspecionar visualmente o gabinete, display, conectores e cabos de sinal quanto a trincas ou folgas.
+- Verificar o estado de conservação mecânica, nível de carga de baterias internas e correta fixação dos terminais.
 
-3. Padrão de Trabalho e Rastreabilidade RBC:
-Utilizar padrões de calibração rastreáveis RBC/INMETRO com relação de capacidade de medição TUR ≥ 4:1.
+### ETAPA 3: 📐 Padrões de Referência & Rastreabilidade RBC
+- Utilizar padrões calibrados por laboratórios da Rede Brasileira de Calibração (RBC/Inmetro) com certificados válidos.
+- Assegurar conformidade com relação de incerteza metrológica recomendada (TUR ≥ 4:1 em todos os pontos).
 
-4. Sequência Operacional de Ensaio:
+### ETAPA 4: ⚖️ Execução do Ensaio Passo a Passo
 ${cleanDraft.trim()}
 
-5. Critérios de Aceitação e Tolerâncias:
-Calcular o erro de indicação em cada ponto (Erro = Indicação - Padrão). O instrumento é aprovado se o erro estiver dentro dos limites máximos admissíveis de fábrica.`;
+### ETAPA 5: 📊 Critérios de Aceitação & Incerteza de Medição
+- Determinar o erro sistemático em cada ponto nominal: Erro = Leitura da UUT - Valor Convencionalmente Verdadeiro do Padrão.
+- Critério de Aprovação: O erro de indicação somado à incerteza expandida (k=2) não deve ultrapassar o Erro Máximo Permissível (EMP) especificado pelo fabricante.`;
 }
 
 module.exports = {
