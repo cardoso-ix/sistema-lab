@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#020409">
+  <title>CalibHub Pro - Terminal de Bancada Metrológica & Procedimentos</title>
+  <meta name="description" content="Terminal de bancada metrológica para consulta de procedimentos, fotos de identificação e certificados de calibração em conformidade com ISO/IEC 17025.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css?v=4.0">
+</head>
+<body class="lab-body">
+
+  <!-- ============================================================ -->
+  <!-- TELA DE LOGIN: TERMINAL DE ACESSO METROLÓGICO                -->
+  <!-- ============================================================ -->
+  <div id="loginSection" class="auth-wrapper">
+    <div class="lab-grid-overlay"></div>
+    <div class="auth-card">
+      <div class="terminal-status-strip">
+        <span class="pulse-dot"></span>
+        <span class="status-text">TERMINAL DE ACESSO • LABORATÓRIO DE CALIBRAÇÃO</span>
+      </div>
+
+      <div class="auth-header">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="logo-icon">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+        </div>
+        <h1 class="auth-title">CalibHub <span class="pro-tag">PRO</span></h1>
+        <p class="auth-subtitle">Sistema de Gestão de Bancada & Procedimentos de Ensaios</p>
+        <div class="auth-compliance-badges">
+          <span class="lab-badge">ISO/IEC 17025</span>
+          <span class="lab-badge">RBC / INMETRO</span>
+          <span class="lab-badge">RASTREABILIDADE ATIVA</span>
+        </div>
+      </div>
+
+      <div id="loginAlert" class="alert alert-error" style="display: none;"></div>
+
+      <form id="loginForm" class="auth-form" novalidate>
+        <div class="form-group">
+          <label for="loginUsername">Identificação do Metrologista / Matrícula <span class="req">*</span></label>
+          <div class="input-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="input-icon">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <input type="text" id="loginUsername" placeholder="Usuário (ex: admin ou tecnico)" autocomplete="username" required>
+          </div>
+          <span class="field-error" id="loginUsernameError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword">Chave de Segurança / Senha <span class="req">*</span></label>
+          <div class="input-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="input-icon">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" required>
+          </div>
+          <span class="field-error" id="loginPasswordError"></span>
+        </div>
+
+        <button type="submit" id="btnLogin" class="btn btn-primary btn-block btn-lg">
+          <span>Autenticar na Bancada</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </button>
+      </form>
+
+      <div class="auth-hints">
+        <p class="hint-title">Credenciais Pré-Configuradas:</p>
+        <div class="hint-grid">
+          <button type="button" class="btn-chip" onclick="prefillLogin('admin', 'admin123')">
+            <span class="chip-role adm">ADM</span>
+            <span class="chip-data">admin / admin123</span>
+          </button>
+          <button type="button" class="btn-chip" onclick="prefillLogin('tecnico', 'tecnico123')">
+            <span class="chip-role tec">TÉCNICO</span>
+            <span class="chip-data">tecnico / tecnico123</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="auth-footer-credit">
+        <span>CalibHub Pro <span class="pro-tag">v1.0</span> • Criado por <strong>Eduardo Cardoso</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- APLICAÇÃO PRINCIPAL: TERMINAL METROLÓGICO                    -->
+  <!-- ============================================================ -->
+  <div id="appSection" class="app-container" style="display: none;">
+
+    <!-- Header Principal -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="header-brand">
+          <div class="brand-badge-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="brand-icon">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 3v3M12 18v3M3 12h3M18 12h3" />
+              <circle cx="12" cy="12" r="2" />
+            </svg>
+          </div>
+          <div>
+            <div class="brand-name">CalibHub <span class="brand-pro">PRO</span></div>
+            <div class="brand-sub">Laboratório de Calibração Metrológica</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="user-profile-badge">
+          <div class="user-avatar" id="headerAvatar">T</div>
+          <div class="user-details">
+            <span class="user-name" id="headerUserName">Carregando...</span>
+            <span class="role-badge" id="headerUserRole">TÉCNICO</span>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button type="button" id="btnAdminPanel" class="btn btn-secondary btn-sm" style="display: none;" onclick="openUsersModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon-sm">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span>Técnicos & Acessos</span>
+          </button>
+
+          <button type="button" id="btnLogout" class="btn btn-outline btn-sm" onclick="logout()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon-sm">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+            </svg>
+            <span>Desconectar</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="app-main">
+      
+      <!-- Quick Stats Metrológicos -->
+      <section class="stats-overview">
+        <div class="stat-card">
+          <div class="stat-icon-wrapper cyan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+              <line x1="8" y1="21" x2="16" y2="21" />
+              <line x1="12" y1="17" x2="12" y2="21" />
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="statTotalInstruments">0</span>
+            <span class="stat-title">Instrumentos em Catálogo</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrapper green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="statTotalPOPs">100%</span>
+            <span class="stat-title">POPs e Métodos Homologados</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrapper amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 14 14" />
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">Referência Ativa</span>
+            <span class="stat-title">Certificados Anteriores Vinculados</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Toolbar de Bancada com Busca de Alta Velocidade -->
+      <section class="bench-toolbar">
+        <div class="search-box">
+          <div class="search-input-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+            <input type="text" id="searchInput" placeholder="Pesquisar por modelo, fabricante, grandeza metrológica ou TAG... (Pressione /)" autocomplete="off">
+            <span class="search-shortcut">/</span>
+          </div>
+        </div>
+
+        <div class="toolbar-actions">
+          <div class="measurand-filter-box" id="measurandFilterBox">
+            <label for="measurandSelectFilter" class="measurand-filter-flag">
+              <span class="flag-icon">🏷️</span>
+              <span class="flag-text">Grandeza:</span>
+            </label>
+            <div class="measurand-select-wrapper">
+              <select id="measurandSelectFilter" class="measurand-select" aria-label="Filtrar por Grandeza Metrológica">
+                <option value="">Todas as Grandezas (14)</option>
+                <option value="Elétrica">⚡ Elétrica</option>
+                <option value="Pressão">🧭 Pressão</option>
+                <option value="Temperatura">🌡️ Temperatura</option>
+                <option value="Dimensional">📏 Dimensional</option>
+                <option value="Massa">⚖️ Massa &amp; Balanças</option>
+                <option value="Força e Torque">🔩 Força &amp; Torque</option>
+                <option value="Vazão e Volume">🧪 Vazão &amp; Volume</option>
+                <option value="Tempo e Frequência">⏱️ Tempo &amp; Freq.</option>
+                <option value="Umidade">💧 Umidade</option>
+                <option value="Acústica e Vibração">🔊 Acústica &amp; Vibração</option>
+                <option value="Óptica e Radiação">💡 Óptica &amp; Radiação</option>
+                <option value="Físico-Química">🔬 Físico-Química</option>
+                <option value="Gás e Detecção">🧯 Gás &amp; Detecção</option>
+                <option value="Outras">⚙️ Outras</option>
+              </select>
+              <span class="measurand-select-chevron" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </span>
+            </div>
+            <button type="button" id="btnClearMeasurandFilter" class="btn-clear-measurand" title="Limpar filtro e ver todas as grandezas" style="display: none;" onclick="clearMeasurandFilter()">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          <button type="button" id="btnNewInstrument" class="btn btn-primary" style="display: none;" onclick="openInstrumentModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            <span>Cadastrar Instrumento</span>
+          </button>
+          <div id="tecnicoNoticeBadge" style="display: none; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); background: rgba(255,255,255,0.04); border: 1px solid var(--border-lab); padding: 7px 12px; border-radius: var(--radius-sm);">
+            <span>🔬 Modo Consulta de Bancada (Para cadastrar, entre como ADM)</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Galeria de Plaquetas Metrológicas -->
+      <section class="catalog-section">
+        <div class="catalog-header">
+          <div class="catalog-header-left">
+            <h2 class="section-title">Equipamentos & Fichas de Bancada</h2>
+            <span class="catalog-count" id="catalogCount">Carregando catálogo...</span>
+          </div>
+        </div>
+
+        <div id="instrumentsGrid" class="instruments-grid">
+          <!-- Cards injetados via JavaScript -->
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3M9 11h4" />
+          </svg>
+          <h3>Nenhum instrumento localizado</h3>
+          <p>Tente alterar o termo de busca ou selecionar outra grandeza metrológica.</p>
+        </div>
+      </section>
+
+      <!-- Floating Action Button para Celular (Mobile FAB) -->
+      <button type="button" id="btnMobileFab" class="mobile-fab" style="display: none;" onclick="openInstrumentModal()" title="Cadastrar Novo Instrumento">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="fab-icon">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        <span class="fab-label">Novo Equipamento</span>
+      </button>
+    </main>
+
+    <!-- Rodapé Oficial do Sistema v1.0 -->
+    <footer class="app-footer">
+      <div class="footer-container">
+        <div class="footer-left">
+          <span class="footer-brand">CalibHub <span class="footer-version">v1.0</span></span>
+          <span class="footer-sep">•</span>
+          <span class="footer-standard">ISO/IEC 17025</span>
+          <span class="footer-sep">•</span>
+          <span class="footer-author">Criado por <strong>Eduardo Cardoso</strong></span>
+        </div>
+        <div class="footer-right">
+          <span class="footer-security-badge">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            Terminal Seguro • HMAC-SHA256 &amp; Scrypt
+          </span>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL 1: COCKPIT DE BANCADA METROLÓGICA (Consulta Completa)  -->
+  <!-- ============================================================ -->
+  <div id="detailModal" class="modal-backdrop" style="display: none;">
+    <div class="modal-dialog modal-xl">
+      
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-tag-row">
+            <span class="modal-badge-tag" id="detailTag">TAG</span>
+            <span class="badge-measurand" id="detailMeasurandBadge">Grandeza</span>
+          </div>
+          <h2 class="modal-title" id="detailName">Nome do Instrumento</h2>
+          <span class="modal-subtitle" id="detailManufacturerModel">Fabricante | Modelo</span>
+        </div>
+        <button type="button" class="modal-close" onclick="closeDetailModal()" title="Fechar (ESC)">&times;</button>
+      </div>
+
+      <div class="modal-body detail-layout">
+        <!-- Coluna Esquerda: Inspeção Visual & Ficha de Calibração -->
+        <div class="detail-sidebar">
+          
+          <div class="photo-container" onclick="zoomPhoto()">
+            <img id="detailPhoto" src="" alt="Foto do instrumento" class="detail-img">
+            <div class="photo-hud-overlay">
+              <span class="hud-tag">INSPEÇÃO VISUAL DO MODELO</span>
+              <div class="photo-zoom-hint">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="zoom-icon">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3M11 8v6M8 11h6" />
+                </svg>
+                <span>Ampliar Foto da Bancada</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="spec-card">
+            <div class="spec-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spec-icon">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+              </svg>
+              <span>Especificações Técnicas</span>
+            </div>
+            
+            <div class="spec-row">
+              <span class="spec-label">Grandeza:</span>
+              <span class="spec-value" id="detailMeasurand">-</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Faixa de Medição:</span>
+              <span class="spec-value lcd-text" id="detailRange">-</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Homologado por:</span>
+              <span class="spec-value" id="detailCreatedBy">-</span>
+            </div>
+          </div>
+
+          <!-- Terminal de Pontos da Última Calibração (Destaque Metrológico) -->
+          <div class="quick-points-box">
+            <div class="box-header">
+              <div class="box-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="box-icon">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+              </div>
+              <div class="box-title-wrap">
+                <h4>PONTOS DA ÚLTIMA CALIBRAÇÃO (REFERÊNCIA)</h4>
+                <span class="box-subtitle">Conferência metrológica para a nova calibração</span>
+              </div>
+            </div>
+            <div class="points-content mono" id="detailTypicalPoints">
+              Carregando pontos...
+            </div>
+          </div>
+
+          <!-- Ações de Bancada na Ficha -->
+          <div id="adminDetailActions" class="admin-detail-actions" style="display: none;">
+            <button type="button" id="btnEditInstrument" class="btn btn-secondary btn-block btn-sm" onclick="editCurrentInstrument()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon-sm">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
+              <span>Editar Instrumento</span>
+            </button>
+            <button type="button" id="btnDeleteInstrument" class="btn btn-danger btn-block btn-sm" onclick="deleteCurrentInstrument()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon-sm">
+                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg>
+              <span>Excluir Instrumento</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Coluna Direita: Documentação Integrada (POP, Certificado, Manual) -->
+        <div class="detail-main">
+          <div class="doc-tabs">
+            <button type="button" class="doc-tab active" onclick="switchDocTab('procTab')">
+              <span class="tab-indicator"></span>
+              <span>📋 1. Como Calibrar (POP)</span>
+            </button>
+            <button type="button" class="doc-tab" onclick="switchDocTab('certTab')">
+              <span class="tab-indicator"></span>
+              <span>📑 2. Último Certificado (Pontos)</span>
+            </button>
+            <button type="button" class="doc-tab" onclick="switchDocTab('manualTab')">
+              <span class="tab-indicator"></span>
+              <span>📖 3. Manual do Fabricante</span>
+            </button>
+          </div>
+
+          <!-- Tab 1: Procedimento Operacional Padrão (POP) -->
+          <div id="procTab" class="doc-tab-pane active">
+            <div class="doc-pane-header">
+              <div class="doc-pane-meta">
+                <span class="doc-badge-status">POP VIGENTE</span>
+                <span class="doc-pane-title">Roteiro Passo a Passo na Bancada</span>
+              </div>
+              <div id="procDownloadBtn"></div>
+            </div>
+            <div class="procedure-text-view" id="detailProcedureText"></div>
+            <div id="procPdfViewerContainer" class="pdf-viewer-container" style="display: none;">
+              <iframe id="procPdfFrame" src="" class="pdf-iframe" title="Visualizador do Procedimento"></iframe>
+            </div>
+          </div>
+
+          <!-- Tab 2: Último Certificado de Calibração -->
+          <div id="certTab" class="doc-tab-pane" style="display: none;">
+            <div class="doc-pane-header">
+              <div class="doc-pane-meta">
+                <span class="doc-badge-status cert">REFERÊNCIA ANTERIOR</span>
+                <span class="doc-pane-title">Certificado de Calibração Anterior</span>
+              </div>
+              <div id="certDownloadBtn"></div>
+            </div>
+            <div id="certPdfViewerContainer" class="pdf-viewer-container">
+              <iframe id="certPdfFrame" src="" class="pdf-iframe" title="Visualizador do Certificado"></iframe>
+            </div>
+            <div id="certEmptyMsg" class="empty-doc-msg" style="display: none;">
+              <p>Nenhum arquivo PDF de certificado anterior anexado para este instrumento.</p>
+            </div>
+          </div>
+
+          <!-- Tab 3: Manual Técnico do Fabricante -->
+          <div id="manualTab" class="doc-tab-pane" style="display: none;">
+            <div class="doc-pane-header">
+              <div class="doc-pane-meta">
+                <span class="doc-badge-status manual">DOCUMENTO DE FÁBRICA</span>
+                <span class="doc-pane-title">Manual Técnico do Equipamento</span>
+              </div>
+              <div id="manualDownloadBtn"></div>
+            </div>
+            <div id="manualPdfViewerContainer" class="pdf-viewer-container">
+              <iframe id="manualPdfFrame" src="" class="pdf-iframe" title="Visualizador do Manual"></iframe>
+            </div>
+            <div id="manualEmptyMsg" class="empty-doc-msg" style="display: none;">
+              <p>Nenhum manual técnico anexado para este instrumento.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL 2: CADASTRO / EDIÇÃO COM TRAVAS DE VALIDAÇÃO (ADM)    -->
+  <!-- ============================================================ -->
+  <div id="formModal" class="modal-backdrop" style="display: none;">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div>
+          <span class="modal-badge-tag">FICHA TÉCNICA METROLÓGICA</span>
+          <h2 class="modal-title" id="formModalTitle">Cadastrar Instrumento</h2>
+        </div>
+        <button type="button" class="modal-close" onclick="closeFormModal()">&times;</button>
+      </div>
+
+      <div id="formAlert" class="alert alert-error" style="display: none;"></div>
+
+      <form id="instrumentForm" class="modal-form" novalidate enctype="multipart/form-data">
+        <input type="hidden" id="instrumentId" value="">
+
+        <!-- SEÇÃO 1: IDENTIFICAÇÃO DO INSTRUMENTO & RASTREABILIDADE -->
+        <div class="form-section-divider">
+          <span>1. Identificação do Instrumento & Rastreabilidade</span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-4">
+            <label for="inputTag">TAG / Código de Rastreabilidade <span class="req">*</span></label>
+            <input type="text" id="inputTag" placeholder="Ex: CAL-EL-014" required>
+            <span class="field-error" id="inputTagError"></span>
+          </div>
+          <div class="form-group col-8">
+            <label for="inputName">Nome do Instrumento / Equipamento <span class="req">*</span></label>
+            <input type="text" id="inputName" placeholder="Ex: Multímetro Digital True RMS 4½ Dígitos" required>
+            <span class="field-error" id="inputNameError"></span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-4">
+            <label for="inputManufacturer">Fabricante <span class="req">*</span></label>
+            <input type="text" id="inputManufacturer" list="commonManufacturersList" placeholder="Ex: Fluke, Wika, Mitutoyo..." required autocomplete="off">
+            <datalist id="commonManufacturersList">
+              <option value="Fluke"></option>
+              <option value="Wika"></option>
+              <option value="Mitutoyo"></option>
+              <option value="Yokogawa"></option>
+              <option value="Instrutherm"></option>
+              <option value="Novus"></option>
+              <option value="Presys"></option>
+              <option value="Megabras"></option>
+              <option value="Minipa"></option>
+              <option value="Testo"></option>
+              <option value="Ashcroft"></option>
+              <option value="GE Druck"></option>
+              <option value="Mettler Toledo"></option>
+              <option value="Gehaka"></option>
+              <option value="Tektronix"></option>
+              <option value="Keysight"></option>
+            </datalist>
+            <span class="field-error" id="inputManufacturerError"></span>
+          </div>
+
+          <div class="form-group col-4">
+            <label for="inputModel">Modelo <span class="req">*</span></label>
+            <input type="text" id="inputModel" placeholder="Ex: 87-V, 232.50, 500-196..." required autocomplete="off">
+            <span class="field-error" id="inputModelError"></span>
+          </div>
+
+          <div class="form-group col-4">
+            <label for="inputMeasurand">Grandeza Metrológica <span class="req">*</span></label>
+            <select id="inputMeasurand" required>
+              <option value="Elétrica">⚡ Elétrica (Multímetros, Calibradores, Alicates, Fontes)</option>
+              <option value="Pressão">🧭 Pressão & Vácuo (Manômetros, Transmissores, Barômetros)</option>
+              <option value="Temperatura">🌡️ Temperatura (Termômetros, Termopares, PT100, Banhos)</option>
+              <option value="Dimensional">📏 Dimensional (Paquímetros, Micrômetros, Relógios, Blocos)</option>
+              <option value="Massa">⚖️ Massa & Balanças (Balanças Analíticas, Industriais, Pesos)</option>
+              <option value="Força e Torque">🔩 Força, Torque & Dureza (Torquímetros, Células, Dinamômetros)</option>
+              <option value="Vazão e Volume">🧪 Vazão, Volume & Fluidos (Medidores, Rotâmetros, Pipetas)</option>
+              <option value="Tempo e Frequência">⏱️ Tempo, Frequência & Rotação (Cronômetros, Tacômetros)</option>
+              <option value="Umidade">💧 Umidade (Termo-higrômetros, Sensores, Câmaras)</option>
+              <option value="Acústica e Vibração">🔊 Acústica & Vibração (Decibelímetros, Acelerômetros)</option>
+              <option value="Óptica e Radiação">💡 Óptica & Radiação (Luxímetros, Espectrofotômetros)</option>
+              <option value="Físico-Química">🔬 Físico-Química (pHmetros, Condutivímetros, Refratômetros)</option>
+              <option value="Gás e Detecção">🧯 Gás & Detecção (Detectores de Gás, Analisadores CO/O2)</option>
+              <option value="Outras">⚙️ Outras Grandezas / Especial</option>
+            </select>
+            <span class="field-error" id="inputMeasurandError"></span>
+          </div>
+        </div>
+
+        <!-- SEÇÃO 2: ESPECIFICAÇÕES TÉCNICAS & PONTOS DE ENSAIO -->
+        <div class="form-section-divider">
+          <span>2. Especificações Técnicas & Pontos de Calibração</span>
+        </div>
+
+        <div class="form-group">
+          <label for="inputRange">Faixa de Medição e Capacidade <span class="req">*</span></label>
+          <input type="text" id="inputRange" placeholder="Ex: 0 a 1000V DC/AC, 0 a 10A, 50MΩ" required>
+          <span class="field-error" id="inputRangeError"></span>
+        </div>
+
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label for="inputTypicalPoints" style="margin-bottom: 0;">Pontos de Calibração da Última Vez (Referência) <span class="req">*</span></label>
+            <span class="field-hint-badge">Malha de Ensaio</span>
+          </div>
+          <textarea id="inputTypicalPoints" rows="4" class="code-editor-textarea" placeholder="Descreva os pontos nominais utilizados na última calibração (ex: 40mV, 400mV, 4V, 40V, 400V, 1000V DC; 10A DC)..." required></textarea>
+          <span class="field-error" id="inputTypicalPointsError"></span>
+        </div>
+
+        <!-- SEÇÃO 3: ROTEIRO OPERACIONAL PADRÃO (COM ÁUDIO & IA) -->
+        <div class="form-section-divider">
+          <span>3. Roteiro Operacional Padrão de Bancada (POP / Como Calibrar)</span>
+        </div>
+
+        <div class="form-group procedure-editor-group">
+          <div class="procedure-editor-header">
+            <div>
+              <label for="inputProcedureText" class="procedure-editor-title">
+                <span>📋 Roteiro Operacional Padrão de Bancada (POP)</span>
+                <span class="req">*</span>
+              </label>
+              <span class="procedure-editor-desc">Fale pelo microfone ou digite seu relato informal. A IA reescreve tudo em um POP formal segundo a ISO/IEC 17025.</span>
+            </div>
+
+            <!-- Barra de Ações: Áudio & IA DeepSeek v4.1 -->
+            <div class="procedure-ai-actions">
+              <button type="button" id="btnVoiceRecord" class="btn-voice-record" onclick="toggleVoiceRecording()" title="Gravar áudio pelo microfone e transcrever em tempo real">
+                <span class="voice-mic-icon">🎙️</span>
+                <span id="voiceRecordText">Falar por Áudio</span>
+              </button>
+
+              <button type="button" id="btnAiRefinePop" class="btn-ai-refine" onclick="refineProcedureTextWithAi()" title="Reescrever o relato do técnico com IA segundo a ABNT NBR ISO/IEC 17025">
+                <span>✨</span>
+                <span id="aiRefineBtnText">Melhorar com IA</span>
+              </button>
+
+              <button type="button" id="btnUndoProcedure" class="btn-undo-text" onclick="undoProcedureText()" style="display: none;" title="Desfazer e voltar ao texto anterior">
+                <span>↩️</span>
+                <span>Desfazer</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Indicador visual de gravação de áudio em tempo real -->
+          <div id="audioRecordIndicator" class="audio-record-banner" style="display: none;">
+            <div class="recording-pulse-box">
+              <span class="recording-dot"></span>
+              <span id="audioRecordTimer">Gravando áudio (00:00)...</span>
+            </div>
+            <span class="audio-record-hint">Fale como foi feita a calibração. A transcrição aparecerá no campo abaixo. Clique novamente no botão para encerrar.</span>
+          </div>
+
+          <!-- Balão de transcrição interina ao vivo com microfone ativo -->
+          <div id="audioLiveTranscriptBox" class="audio-live-transcript" style="display: none;">
+            <span class="live-mic-tag">
+              <span class="live-pulse-dot"></span>
+              Ouvindo:
+            </span>
+            <span id="audioLiveInterimText" class="live-mic-phrase">...</span>
+          </div>
+
+          <!-- Alerta de status do aprimoramento da IA -->
+          <div id="aiRefineStatus" class="alert alert-info" style="display: none; margin-bottom: 12px;"></div>
+
+          <textarea id="inputProcedureText" rows="12" class="code-editor-textarea procedure-large-textarea" placeholder="Descreva os passos da calibração (ou clique em 'Falar por Áudio' para ditar pelo microfone):&#10;Ex: 'Foi feita a aclimatação por 2 horas a 23°C. Utilizamos o calibrador Fluke 5522A. Aplicamos tensão DC de 0 a 1000V nos bornes V/COM...'&#10;&#10;Depois clique em '✨ Melhorar com IA' para que o DeepSeek v4.1 estruture o POP formal da ISO/IEC 17025." required></textarea>
+          <span class="field-error" id="inputProcedureTextError"></span>
+        </div>
+
+        <!-- Foto & Documentos -->
+        <div class="form-section-divider">
+          <span>Foto de Identificação Visual & Documentação Anexa</span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-12 photo-field-group">
+            <div class="photo-field-header">
+              <label class="photo-field-title">
+                <span>📷 Foto do Equipamento</span>
+                <span class="req" id="photoReqStar">*</span>
+              </label>
+              <span class="field-hint-badge">Obrigatório para identificação</span>
+            </div>
+
+            <!-- Inputs nativos ocultos -->
+            <input type="file" id="inputPhotoCamera" accept="image/*" capture="environment" style="display: none;">
+            <input type="file" id="inputPhotoGallery" accept="image/jpeg,image/png,image/webp,image/jpg" style="display: none;">
+            <input type="file" id="inputPhoto" accept="image/jpeg,image/png,image/webp,image/jpg" style="display: none;">
+            <input type="hidden" id="usingDefaultPhoto" value="false">
+
+            <!-- Barra de Ações de Foto: Foto com Enquadramento & Escolher Arquivo -->
+            <div class="photo-capture-grid">
+              <button type="button" class="btn-framing-action" onclick="openCameraModal()" title="Abrir câmera com guias de enquadramento metrológico para fotografar o instrumento">
+                <div class="action-icon-box framing">
+                  <span class="action-icon">🎯</span>
+                </div>
+                <div class="action-text-box">
+                  <span class="action-title">Foto com Enquadramento</span>
+                  <span class="action-desc">Câmera com retícula de precisão</span>
+                </div>
+              </button>
+
+              <button type="button" class="btn-choose-file-action" onclick="triggerGalleryPicker()" title="Selecionar imagem ou foto salva no computador ou celular">
+                <div class="action-icon-box file">
+                  <span class="action-icon">📁</span>
+                </div>
+                <div class="action-text-box">
+                  <span class="action-title">Escolher Arquivo</span>
+                  <span class="action-desc" id="photoFileNameBadge">JPG, PNG ou WEBP</span>
+                </div>
+              </button>
+            </div>
+
+            <span class="field-error" id="inputPhotoError"></span>
+
+            <!-- Card de Prévia & Confirmação da Foto Capturada -->
+            <div id="photoPreviewContainer" class="photo-preview-card" style="display: none;">
+              <div class="photo-preview-thumb-box">
+                <img id="photoPreviewImg" src="" alt="Foto do instrumento" onclick="zoomCurrentPreviewPhoto()">
+                <span class="preview-badge-status">✓ Foto Pronta</span>
+              </div>
+              <div class="photo-preview-info">
+                <div class="photo-preview-title" id="photoPreviewStatusText">Foto do equipamento anexada</div>
+                <div class="photo-preview-details" id="photoPreviewMeta">Pronta para o cadastro</div>
+                <div class="photo-preview-actions">
+                  <button type="button" class="btn-retake-photo" onclick="openCameraModal()" title="Capturar nova foto com o visor de enquadramento">
+                    <span>🎯 Nova Foto</span>
+                  </button>
+                  <button type="button" class="btn-remove-photo" onclick="clearSelectedPhoto()">
+                    <span>✕ Remover</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Documentação Técnica Anexa (PDFs) -->
+        <div class="form-row">
+          <div class="form-group col-4">
+            <label for="inputCert">PDF do Último Certificado (Opcional)</label>
+            <input type="file" id="inputCert" accept="application/pdf">
+            <span class="field-hint">Certificado anterior (.pdf)</span>
+            <span class="field-error" id="inputCertError"></span>
+          </div>
+
+          <div class="form-group col-4">
+            <label for="inputManual">PDF do Manual Técnico (Opcional)</label>
+            <input type="file" id="inputManual" accept="application/pdf">
+            <span class="field-hint">Manual do fabricante (.pdf)</span>
+          </div>
+
+          <div class="form-group col-4">
+            <label for="inputProcedure">PDF do Procedimento/POP (Opcional)</label>
+            <input type="file" id="inputProcedure" accept="application/pdf">
+            <span class="field-hint">Documento formal do POP (.pdf)</span>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeFormModal()">Cancelar</button>
+          <button type="submit" id="btnSaveInstrument" class="btn btn-primary">
+            <span>Salvar Instrumento com Trava de Validação</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL 3: GESTÃO DE TÉCNICOS (ADM)                            -->
+  <!-- ============================================================ -->
+  <div id="usersModal" class="modal-backdrop" style="display: none;">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div>
+          <span class="modal-badge-tag">CONTROLE DE ACESSO</span>
+          <h2 class="modal-title">Gestão de Técnicos Metrologistas</h2>
+        </div>
+        <button type="button" class="modal-close" onclick="closeUsersModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div id="userAlert" class="alert alert-error" style="display: none;"></div>
+
+        <div class="create-user-box">
+          <h3 class="box-title">Cadastrar Novo Metrologista</h3>
+          <form id="newUserForm" class="user-inline-form" novalidate>
+            <div class="form-group">
+              <label for="newUsername">Login / Usuário <span class="req">*</span></label>
+              <input type="text" id="newUsername" placeholder="Ex: joao_silva" required>
+            </div>
+            <div class="form-group">
+              <label for="newFullName">Nome Completo <span class="req">*</span></label>
+              <input type="text" id="newFullName" placeholder="Ex: João da Silva" required>
+            </div>
+            <div class="form-group">
+              <label for="newPassword">Senha Inicial <span class="req">*</span></label>
+              <input type="password" id="newPassword" placeholder="Mínimo 4 dígitos" required>
+            </div>
+            <div class="form-group">
+              <label for="newRole">Perfil <span class="req">*</span></label>
+              <select id="newRole" required>
+                <option value="tecnico">Técnico (Apenas Consulta)</option>
+                <option value="admin">Administrador (Total)</option>
+              </select>
+            </div>
+            <div class="form-group align-end">
+              <button type="submit" class="btn btn-primary">Cadastrar</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="users-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Metrologista</th>
+                <th>Usuário</th>
+                <th>Perfil de Acesso</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <!-- Injetado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox Zoom de Foto em Alta Resolução -->
+  <div id="photoLightbox" class="lightbox-backdrop" style="display: none;" onclick="closeZoomPhoto()">
+    <div class="lightbox-content">
+      <div class="lightbox-header-hint">Clique em qualquer lugar ou pressione ESC para fechar</div>
+      <img id="lightboxImg" src="" alt="Foto ampliada">
+      <div class="lightbox-caption" id="lightboxCaption"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL DE VISOR DE CÂMERA AO VIVO (IN-APP CAMERA VIEWFINDER) -->
+  <!-- ============================================================ -->
+  <div id="cameraModal" class="camera-backdrop" style="display: none;">
+    <div class="camera-container">
+      <div class="camera-top-bar">
+        <span class="camera-title-badge">CÂMERA DO LABORATÓRIO</span>
+        <button type="button" class="camera-close-btn" onclick="closeCameraModal()">&times;</button>
+      </div>
+
+      <div class="camera-viewfinder-wrapper">
+        <video id="cameraVideo" class="camera-video-stream" autoplay playsinline muted></video>
+        <canvas id="cameraCanvas" style="display: none;"></canvas>
+        
+        <!-- Guias de Enquadramento do Instrumento -->
+        <div class="camera-target-reticle">
+          <div class="reticle-corner top-left"></div>
+          <div class="reticle-corner top-right"></div>
+          <div class="reticle-corner bottom-left"></div>
+          <div class="reticle-corner bottom-right"></div>
+          <div class="reticle-hint">🎯 Enquadramento Metrológico • Centralize o Instrumento</div>
+        </div>
+      </div>
+
+      <div class="camera-bottom-bar">
+        <button type="button" class="btn-camera-ctrl" onclick="switchCameraFacingMode()" title="Alternar câmera frontal/traseira">
+          <span class="ctrl-icon">🔄</span>
+          <span>Virar</span>
+        </button>
+
+        <button type="button" class="btn-camera-shutter" onclick="captureFromVideo()" title="Capturar foto agora">
+          <div class="shutter-circle"></div>
+        </button>
+
+        <button type="button" class="btn-camera-ctrl" onclick="closeCameraModal()" title="Cancelar captura">
+          <span class="ctrl-icon">✕</span>
+          <span>Fechar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js?v=3.6"></script>
+</body>
+</html>
