@@ -76,7 +76,6 @@ describe('Testes de Integração da API & Segurança (HTTP)', () => {
     assert.equal(res.status, 200);
     const data = await res.json();
     assert.ok(Array.isArray(data.instruments));
-    assert.ok(data.instruments.length >= 1, 'Deve conter os instrumentos do seed');
   });
 
   test('POST /api/instruments com token de Técnico deve permitir cadastro de bancada (HTTP 201)', async () => {

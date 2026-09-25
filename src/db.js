@@ -109,6 +109,11 @@ function seedDefaultUsers(db) {
  * @param {DatabaseSync} db
  */
 function seedDefaultInstruments(db) {
+  // Sementes de demonstração só são inseridas se explicitamente ativadas via SEED_DEMO_INSTRUMENTS=true
+  if (process.env.SEED_DEMO_INSTRUMENTS !== 'true') {
+    return;
+  }
+
   const checkStmt = db.prepare('SELECT COUNT(*) as count FROM instruments');
   const result = checkStmt.get();
 

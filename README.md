@@ -50,12 +50,24 @@ O servidor será iniciado na porta **3000**:
 
 ---
 
-## 🔑 Contas de Acesso Padrão
+## 🔑 Contas de Acesso (Semana de Testes)
 
-| Perfil | Usuário | Senha | Permissões |
+### 🛡️ Administradores (Acesso Total: Cadastro, Edição, Exclusão, Gestão)
+| Nome | Usuário | Senha | Perfil |
 |---|---|---|---|
-| **Administrador** | `admin` | `admin123` | Total: Cadastro, Edição, Exclusão, Gestão de Técnicos |
-| **Técnico** | `tecnico` | `tecnico123` | Consulta: Fichas, Procedimentos POP, Certificados e Manuais |
+| **Eduardo** | `eduardo` | `eduardo123` | Administrador |
+| **Alan** | `alan` | `alan123` | Administrador |
+| **Jean** | `jean` | `jean123` | Administrador |
+| **Admin Padrão** | `admin` | `admin123` | Administrador |
+
+### 🛠️ Técnicos (Consulta de Bancada, Visualização de POP, Certificados e Fotos)
+| Nome | Usuário | Senha | Perfil |
+|---|---|---|---|
+| **Leonardo** | `leonardo` | `leonardo123` | Técnico |
+| **Igor** | `igor` | `igor123` | Técnico |
+| **Daniel** | `daniel` | `daniel123` | Técnico |
+| **Grazieli** | `grazieli` | `grazieli123` | Técnico |
+| **Técnico Padrão** | `tecnico` | `tecnico123` | Técnico |
 
 ---
 
