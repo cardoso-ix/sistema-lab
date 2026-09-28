@@ -1,5 +1,5 @@
 {
-  "name": "calibhub",
+  "name": "sistema-lab",
   "version": "1.0.0",
   "description": "Hub de Procedimentos, Certificados e Fotos de Instrumentos para Laboratório de Calibração",
   "main": "src/server.js",
