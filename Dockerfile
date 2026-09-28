@@ -27,12 +27,11 @@ RUN mkdir -p /app/data /app/uploads/photos /app/uploads/docs
 
 # Configuração de Variáveis de Ambiente Padrão
 ENV NODE_ENV=production
-ENV PORT=3000
 ENV DATA_DIR=/app/data
 ENV UPLOADS_DIR=/app/uploads
 
-# Exposição da porta da aplicação
-EXPOSE 3000
+# Exposição das portas (3000 local / 10000 Render)
+EXPOSE 3000 10000
 
 # Verificação de saúde contínua do container (Healthcheck)
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
