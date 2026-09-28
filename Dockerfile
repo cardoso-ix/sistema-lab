@@ -13,13 +13,12 @@ RUN apk add --no-cache wget
 # Copia manifestos de dependências
 COPY package*.json ./
 
-# Instala apenas dependências de produção
-RUN npm ci --omit=dev
+# Instala dependências de produção de forma resiliente
+RUN npm install --omit=dev
 
 # Copia código-fonte e arquivos da aplicação
 COPY public ./public
 COPY src ./src
-COPY data ./data
 COPY uploads ./uploads
 
 # Cria diretórios persistentes para o banco e uploads
