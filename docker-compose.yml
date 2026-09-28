@@ -1,0 +1,22 @@
+services:
+  calibhub:
+    build: .
+    container_name: calibhub-server
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATA_DIR=/app/data
+      - UPLOADS_DIR=/app/uploads
+      - OPENCODE_API_KEY=${OPENCODE_API_KEY:-}
+    volumes:
+      - calibhub-data:/app/data
+      - calibhub-uploads:/app/uploads
+
+volumes:
+  calibhub-data:
+    driver: local
+  calibhub-uploads:
+    driver: local

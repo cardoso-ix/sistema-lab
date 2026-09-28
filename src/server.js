@@ -37,7 +37,7 @@ const PORT = process.env.PORT || 3000;
 
 // Garante que as pastas de upload existem (com suporte a Vercel serverless)
 const isVercel = !!process.env.VERCEL;
-const baseUploadsDir = isVercel ? path.join('/tmp', 'uploads') : path.join(__dirname, '..', 'uploads');
+const baseUploadsDir = process.env.UPLOADS_DIR || (isVercel ? path.join('/tmp', 'uploads') : path.join(__dirname, '..', 'uploads'));
 const photosDir = path.join(baseUploadsDir, 'photos');
 const docsDir = path.join(baseUploadsDir, 'docs');
 [photosDir, docsDir].forEach(d => {

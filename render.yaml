@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: calibhub-pro
+    env: docker
+    plan: starter
+    region: oregon
+    healthCheckPath: /api/health
+    disk:
+      name: calibhub-storage
+      mountPath: /app/storage
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATA_DIR
+        value: /app/storage/data
+      - key: UPLOADS_DIR
+        value: /app/storage/uploads
+      - key: OPENCODE_API_KEY
+        sync: false

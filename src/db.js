@@ -19,7 +19,7 @@ function initDatabase(dbPath = null) {
       }
       dbPath = path.join(tmpDir, 'calibhub.db');
     } else {
-      const dataDir = path.join(__dirname, '..', 'data');
+      const dataDir = process.env.DATA_DIR || path.join(__dirname, '..', 'data');
       if (!fs.existsSync(dataDir)) {
         fs.mkdirSync(dataDir, { recursive: true });
       }
